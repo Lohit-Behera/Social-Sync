@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     'rest_framework',
     "corsheaders",
+    
+    'customuser.apps.CustomuserConfig',
 ]
 
 SIMPLE_JWT = {
@@ -133,10 +135,24 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+MEDIA_URL = '/images/'
+
+MEDIA_ROOT = 'static/images'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'customuser.CustomUser'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
