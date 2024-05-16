@@ -1,13 +1,26 @@
 import { ThemeProvider } from "@/components/theme-provider";
+import {
+  Route,
+  RouterProvider,
+  createBrowserRouter,
+  createRoutesFromElements,
+} from "react-router-dom";
+
+import Layout from "./Layout";
+import HomePage from "./Pages/HomePage";
+
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" element={<Layout />}>
+      <Route index element={<HomePage />} />
+    </Route>
+  )
+);
 
 function App() {
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <div className="flex justify-center">
-        <h1 className="text-3xl font-bold text-center bg-primary mt-4 w-[20%] rounded-lg py-2">
-          Social Sync
-        </h1>
-      </div>
+      <RouterProvider router={router}></RouterProvider>
     </ThemeProvider>
   );
 }
