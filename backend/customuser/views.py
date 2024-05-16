@@ -17,9 +17,9 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 import os
 
-from .serializers import UserSerializerWithToken, UserSerializer, AddressSerializer, ContactUsSerializer
+from .serializers import UserSerializerWithToken, UserSerializer, ContactUsSerializer
 
-from .models import CustomUser, EmailVerificationToken, Address, ContactUs
+from .models import CustomUser, EmailVerificationToken, ContactUs
 
 # Create your views here.
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -198,46 +198,6 @@ def delete_user(request, pk):
     user = CustomUser.objects.get(id=pk)
     user.delete()
     return Response({'massage': 'User deleted successfully'})
-
-
-@api_view(['PUT'])
-@permission_classes([IsAuthenticated])
-def add_address(request):
-    try:
-        user = request.user
-        data = request.data
-        address = Address.objects.create(
-            user=user,
-            house_no = data['house_no'],
-            landmark = data['landmark'],
-            city = data['city'],
-            state = data['state'],
-            country = data['country'],
-            pincode = data['pincode'],
-        )
-        address.save()
-        return Response({'message': 'Address added successfully'})
-    except:
-        return Response({'message': 'An error occurred while adding address'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_address(request):
-    user = request.user
-    address = Address.objects.filter(user=user)
-    serializer = AddressSerializer(address, many=True)
-    return Response(serializer.data)
-
-@api_view(['DELETE'])
-@permission_classes([IsAuthenticated])
-def delete_address(request, pk):
-    try:
-        address = Address.objects.get(id=pk)
-        address.delete()
-        return Response({'message': 'Address deleted successfully'})
-    except:
-        return Response({'message': 'An error occurred while deleting address'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 @api_view(['DELETE'])
 @permission_classes([IsAdminUser])

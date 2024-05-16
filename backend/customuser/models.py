@@ -38,6 +38,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     profile_image = models.ImageField(upload_to='profile_images/', blank=True, null=True, default='profile_images/profile.png')
+    followers = models.ManyToManyField('self', related_name='following_users', symmetrical=False, blank=True)
+    following = models.ManyToManyField('self', related_name='follower_users', symmetrical=False, blank=True)
     join_date = models.DateField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -66,15 +68,6 @@ class EmailVerificationToken(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     token = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
-    
-class Address(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    house_no = models.CharField(max_length=255)
-    landmark = models.CharField(max_length=255)
-    city = models.CharField(max_length=255)
-    state = models.CharField(max_length=255)
-    country = models.CharField(max_length=255)
-    pincode = models.CharField(max_length=255)
     
 class ContactUs(models.Model):
     name = models.CharField(max_length=255, null=False, blank=False)

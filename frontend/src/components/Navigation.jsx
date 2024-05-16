@@ -1,3 +1,6 @@
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "@/features/UserSlice";
 import { Link, NavLink } from "react-router-dom";
 import {
   Home,
@@ -6,6 +9,7 @@ import {
   NotebookText,
   Clapperboard,
   PanelLeft,
+  LogIn,
 } from "lucide-react";
 import Logo from "@/assets/Logo.svg";
 import { Button } from "@/components/ui/button";
@@ -29,6 +33,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import DarkModeToggle from "./DarkModeToggle";
 
 function Navigation() {
+  const dispatch = useDispatch();
+  const userInfo = useSelector((state) => state.user.userInfo);
+  const handleLogout = () => {
+    dispatch(logout());
+  };
   return (
     <>
       <div className="hidden md:flex">
@@ -40,136 +49,166 @@ function Navigation() {
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
             </Link>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <NavLink to="/">
-                    {({ isActive }) => (
-                      <Button
-                        variant={`${isActive ? "default" : "ghost"}`}
-                        size="icon"
-                        className={`${
-                          !isActive &&
-                          "text-muted-foreground transition-colors hover:text-foreground"
-                        }`}
-                      >
-                        <Home />
-                      </Button>
-                    )}
-                  </NavLink>
-                </TooltipTrigger>
-                <TooltipContent side="right">Home</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <NavLink to="/chat">
-                    {({ isActive }) => (
-                      <Button
-                        variant={`${isActive ? "default" : "ghost"}`}
-                        size="icon"
-                        className={`${
-                          !isActive &&
-                          "text-muted-foreground transition-colors hover:text-foreground"
-                        }`}
-                      >
-                        <Send />
-                      </Button>
-                    )}
-                  </NavLink>
-                </TooltipTrigger>
-                <TooltipContent side="right">Chat</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <NavLink to="/text">
-                    {({ isActive }) => (
-                      <Button
-                        variant={`${isActive ? "default" : "ghost"}`}
-                        size="icon"
-                        className={`${
-                          !isActive &&
-                          "text-muted-foreground transition-colors hover:text-foreground"
-                        }`}
-                      >
-                        <NotebookText />
-                      </Button>
-                    )}
-                  </NavLink>
-                </TooltipTrigger>
-                <TooltipContent side="right">Text</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <NavLink to="/Picture">
-                    {({ isActive }) => (
-                      <Button
-                        variant={`${isActive ? "default" : "ghost"}`}
-                        size="icon"
-                        className={`${
-                          !isActive &&
-                          "text-muted-foreground transition-colors hover:text-foreground"
-                        }`}
-                      >
-                        <Image />
-                      </Button>
-                    )}
-                  </NavLink>
-                </TooltipTrigger>
-                <TooltipContent side="right">Picture</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <NavLink to="/video">
-                    {({ isActive }) => (
-                      <Button
-                        variant={`${isActive ? "default" : "ghost"}`}
-                        size="icon"
-                        className={`${
-                          !isActive &&
-                          "text-muted-foreground transition-colors hover:text-foreground"
-                        }`}
-                      >
-                        <Clapperboard />
-                      </Button>
-                    )}
-                  </NavLink>
-                </TooltipTrigger>
-                <TooltipContent side="right">Video</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            {userInfo ? (
+              <>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <NavLink to="/">
+                        {({ isActive }) => (
+                          <Button
+                            variant={`${isActive ? "default" : "ghost"}`}
+                            size="icon"
+                            className={`${
+                              !isActive &&
+                              "text-muted-foreground transition-colors hover:text-foreground"
+                            }`}
+                          >
+                            <Home />
+                          </Button>
+                        )}
+                      </NavLink>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">Home</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <NavLink to="/chat">
+                        {({ isActive }) => (
+                          <Button
+                            variant={`${isActive ? "default" : "ghost"}`}
+                            size="icon"
+                            className={`${
+                              !isActive &&
+                              "text-muted-foreground transition-colors hover:text-foreground"
+                            }`}
+                          >
+                            <Send />
+                          </Button>
+                        )}
+                      </NavLink>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">Chat</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <NavLink to="/text">
+                        {({ isActive }) => (
+                          <Button
+                            variant={`${isActive ? "default" : "ghost"}`}
+                            size="icon"
+                            className={`${
+                              !isActive &&
+                              "text-muted-foreground transition-colors hover:text-foreground"
+                            }`}
+                          >
+                            <NotebookText />
+                          </Button>
+                        )}
+                      </NavLink>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">Text</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <NavLink to="/Picture">
+                        {({ isActive }) => (
+                          <Button
+                            variant={`${isActive ? "default" : "ghost"}`}
+                            size="icon"
+                            className={`${
+                              !isActive &&
+                              "text-muted-foreground transition-colors hover:text-foreground"
+                            }`}
+                          >
+                            <Image />
+                          </Button>
+                        )}
+                      </NavLink>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">Picture</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <NavLink to="/video">
+                        {({ isActive }) => (
+                          <Button
+                            variant={`${isActive ? "default" : "ghost"}`}
+                            size="icon"
+                            className={`${
+                              !isActive &&
+                              "text-muted-foreground transition-colors hover:text-foreground"
+                            }`}
+                          >
+                            <Clapperboard />
+                          </Button>
+                        )}
+                      </NavLink>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">Video</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </>
+            ) : (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <NavLink to="/login">
+                      {({ isActive }) => (
+                        <Button
+                          variant={`${isActive ? "default" : "ghost"}`}
+                          size="icon"
+                          className={`${
+                            !isActive &&
+                            "text-muted-foreground transition-colors hover:text-foreground"
+                          }`}
+                        >
+                          <LogIn />
+                        </Button>
+                      )}
+                    </NavLink>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">Login</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
           </nav>
           <nav className="mt-auto flex flex-col items-center gap-4 px-2 mb-2">
             <DarkModeToggle />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="overflow-hidden rounded-full"
-                >
-                  <Avatar>
-                    <AvatarImage src="https://github.com/shadcn.png" />
-                    <AvatarFallback>CN</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Support</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Logout</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {userInfo && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="overflow-hidden rounded-full"
+                  >
+                    <Avatar>
+                      <AvatarImage src="https://github.com/shadcn.png" />
+                      <AvatarFallback>CN</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>Settings</DropdownMenuItem>
+                  <DropdownMenuItem>Support</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </nav>
         </aside>
       </div>
@@ -190,106 +229,128 @@ function Navigation() {
                     <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
                 </Link>
-                <NavLink to="/">
-                  {({ isActive }) => (
-                    <Button
-                      variant={`${isActive ? "default" : "ghost"}`}
-                      className={`${
-                        !isActive &&
-                        "text-muted-foreground transition-colors hover:text-foreground"
-                      }`}
-                    >
-                      <Home className="mr-2 h-4 w-4" /> Home
-                    </Button>
-                  )}
-                </NavLink>
+                {userInfo ? (
+                  <>
+                    <NavLink to="/">
+                      {({ isActive }) => (
+                        <Button
+                          variant={`${isActive ? "default" : "ghost"}`}
+                          className={`${
+                            !isActive &&
+                            "text-muted-foreground transition-colors hover:text-foreground"
+                          }`}
+                        >
+                          <Home className="mr-2 h-4 w-4" /> Home
+                        </Button>
+                      )}
+                    </NavLink>
 
-                <NavLink to="/chat">
-                  {({ isActive }) => (
-                    <Button
-                      variant={`${isActive ? "default" : "ghost"}`}
-                      className={`${
-                        !isActive &&
-                        "text-muted-foreground transition-colors hover:text-foreground"
-                      }`}
-                    >
-                      <Send className="mr-2 h-4 w-4" />
-                      Chat
-                    </Button>
-                  )}
-                </NavLink>
+                    <NavLink to="/chat">
+                      {({ isActive }) => (
+                        <Button
+                          variant={`${isActive ? "default" : "ghost"}`}
+                          className={`${
+                            !isActive &&
+                            "text-muted-foreground transition-colors hover:text-foreground"
+                          }`}
+                        >
+                          <Send className="mr-2 h-4 w-4" />
+                          Chat
+                        </Button>
+                      )}
+                    </NavLink>
 
-                <NavLink to="/text">
-                  {({ isActive }) => (
-                    <Button
-                      variant={`${isActive ? "default" : "ghost"}`}
-                      className={`${
-                        !isActive &&
-                        "text-muted-foreground transition-colors hover:text-foreground"
-                      }`}
-                    >
-                      <NotebookText className="mr-2 h-4 w-4" />
-                      Text
-                    </Button>
-                  )}
-                </NavLink>
+                    <NavLink to="/text">
+                      {({ isActive }) => (
+                        <Button
+                          variant={`${isActive ? "default" : "ghost"}`}
+                          className={`${
+                            !isActive &&
+                            "text-muted-foreground transition-colors hover:text-foreground"
+                          }`}
+                        >
+                          <NotebookText className="mr-2 h-4 w-4" />
+                          Text
+                        </Button>
+                      )}
+                    </NavLink>
 
-                <NavLink to="/Picture">
-                  {({ isActive }) => (
-                    <Button
-                      variant={`${isActive ? "default" : "ghost"}`}
-                      className={`${
-                        !isActive &&
-                        "text-muted-foreground transition-colors hover:text-foreground"
-                      }`}
-                    >
-                      <Image className="mr-2 h-4 w-4" />
-                      Picture
-                    </Button>
-                  )}
-                </NavLink>
+                    <NavLink to="/Picture">
+                      {({ isActive }) => (
+                        <Button
+                          variant={`${isActive ? "default" : "ghost"}`}
+                          className={`${
+                            !isActive &&
+                            "text-muted-foreground transition-colors hover:text-foreground"
+                          }`}
+                        >
+                          <Image className="mr-2 h-4 w-4" />
+                          Picture
+                        </Button>
+                      )}
+                    </NavLink>
 
-                <NavLink to="/video">
-                  {({ isActive }) => (
-                    <Button
-                      variant={`${isActive ? "default" : "ghost"}`}
-                      className={`${
-                        !isActive &&
-                        "text-muted-foreground transition-colors hover:text-foreground"
-                      }`}
-                    >
-                      <Clapperboard className="mr-2 h-4 w-4" />
-                      Video
-                    </Button>
-                  )}
-                </NavLink>
+                    <NavLink to="/video">
+                      {({ isActive }) => (
+                        <Button
+                          variant={`${isActive ? "default" : "ghost"}`}
+                          className={`${
+                            !isActive &&
+                            "text-muted-foreground transition-colors hover:text-foreground"
+                          }`}
+                        >
+                          <Clapperboard className="mr-2 h-4 w-4" />
+                          Video
+                        </Button>
+                      )}
+                    </NavLink>
+                  </>
+                ) : (
+                  <NavLink to="/login">
+                    {({ isActive }) => (
+                      <Button
+                        variant={`${isActive ? "default" : "ghost"}`}
+                        className={`${
+                          !isActive &&
+                          "text-muted-foreground transition-colors hover:text-foreground"
+                        }`}
+                      >
+                        <LogIn className="mr-2 h-4 w-4" /> Login
+                      </Button>
+                    )}
+                  </NavLink>
+                )}
               </nav>
             </SheetContent>
           </Sheet>
           <div className="flex justify-center space-x-3">
             <DarkModeToggle />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="overflow-hidden rounded-full"
-                >
-                  <Avatar>
-                    <AvatarImage src="https://github.com/shadcn.png" />
-                    <AvatarFallback>CN</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuItem>Support</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Logout</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {userInfo && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="overflow-hidden rounded-full"
+                  >
+                    <Avatar>
+                      <AvatarImage src="https://github.com/shadcn.png" />
+                      <AvatarFallback>CN</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>Settings</DropdownMenuItem>
+                  <DropdownMenuItem>Support</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </nav>
       </header>

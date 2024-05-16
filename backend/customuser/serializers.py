@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import CustomUser, Address, ContactUs
+from .models import CustomUser, ContactUs
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,11 +21,6 @@ class UserSerializerWithToken(UserSerializer):
     def get_token(self, obj):
         token = RefreshToken.for_user(obj)
         return str(token.access_token)
-    
-class AddressSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Address
-        fields = '__all__'
         
 class ContactUsSerializer(serializers.ModelSerializer):
     class Meta:
