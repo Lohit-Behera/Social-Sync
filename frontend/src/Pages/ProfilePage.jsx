@@ -35,7 +35,6 @@ function ProfilePage() {
         <p>Error</p>
       ) : (
         <>
-          <h1 className="text-3xl font-bold text-center">Profile</h1>
           <div className="w-[96%] md:w-[80%] lg:w-[70%] mx-auto mt-4">
             <Card>
               <CardHeader>

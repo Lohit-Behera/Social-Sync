@@ -38,7 +38,7 @@ function Navigation() {
   const navigate = useNavigate();
 
   const userInfo = useSelector((state) => state.user.userInfo);
-
+  const userDetails = useSelector((state) => state.user.userDetails);
   const handleLogout = () => {
     dispatch(logout());
   };
@@ -217,7 +217,7 @@ function Navigation() {
                     className="overflow-hidden rounded-full"
                   >
                     <Avatar>
-                      <AvatarImage src="https://github.com/shadcn.png" />
+                      <AvatarImage src={userDetails.profile_image} />
                       <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                   </Button>
@@ -230,7 +230,9 @@ function Navigation() {
                   >
                     Profile
                   </DropdownMenuItem>
-                  <DropdownMenuItem>Settings</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/update-profile")}>
+                    Settings
+                  </DropdownMenuItem>
                   <DropdownMenuItem>Support</DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
@@ -378,7 +380,7 @@ function Navigation() {
                     className="overflow-hidden rounded-full"
                   >
                     <Avatar>
-                      <AvatarImage src="https://github.com/shadcn.png" />
+                      <AvatarImage src={userDetails.profile_image} />
                       <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                   </Button>
@@ -391,7 +393,9 @@ function Navigation() {
                   >
                     Profile
                   </DropdownMenuItem>
-                  <DropdownMenuItem>Settings</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/update-profile")}>
+                    Settings
+                  </DropdownMenuItem>
                   <DropdownMenuItem>Support</DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
