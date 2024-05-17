@@ -47,7 +47,14 @@ INSTALLED_APPS = [
     "corsheaders",
     
     'customuser.apps.CustomuserConfig',
+    'post.apps.PostConfig',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=30),

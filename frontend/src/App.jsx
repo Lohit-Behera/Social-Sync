@@ -10,6 +10,9 @@ import Layout from "./Layout";
 import HomePage from "./Pages/HomePage";
 import LoginPage from "./Pages/LoginPage";
 import SignupPage from "./Pages/SignupPage";
+import CreatePost from "./Pages/CreatePost";
+import PostDetails from "./Pages/PostDetails";
+import ProfilePage from "./Pages/ProfilePage";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -17,6 +20,9 @@ const router = createBrowserRouter(
       <Route index element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+      <Route path="/create-post" element={<CreatePost />} />
+      <Route path="/post/:id" element={<PostDetails />} />
+      <Route path="/profile/:id" element={<ProfilePage />} />
     </Route>
   )
 );

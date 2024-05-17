@@ -107,6 +107,28 @@ export const fetchUserUpdate = createAsyncThunk('user/update', async (user, { re
     }
 });
 
+export const fetchUserDetailsUnknown = createAsyncThunk('user/unknown', async (id, { rejectWithValue }) => {
+    try {
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        };
+        const { data } = await axios.get(
+            `/api/user/details/unknown/${id}/`,
+            config
+        );
+        return data;
+    } catch (error) {
+        return rejectWithValue(
+            error.response && error.response.data.message
+                ? error.response.data.message
+                : error.message
+        );
+    }
+});
+
+
 const userSlice = createSlice({
     name: "user",
     initialState: {
@@ -127,6 +149,10 @@ const userSlice = createSlice({
         userUpdate: null,
         userUpdateStatus: "idle",
         userUpdateError: null,
+
+        userDetailsUnknown: null,
+        userDetailsUnknownStatus: "idle",
+        userDetailsUnknownError: null,
     },
     reducers: {
         logout: (state) => {
@@ -194,7 +220,19 @@ const userSlice = createSlice({
             .addCase(fetchUserUpdate.rejected, (state, action) => {
                 state.userUpdateStatus = "failed";
                 state.userUpdateError = action.payload;
-            });
+            })
+
+            .addCase(fetchUserDetailsUnknown.pending, (state) => {
+                state.userDetailsUnknownStatus = "loading";
+            })
+            .addCase(fetchUserDetailsUnknown.fulfilled, (state, action) => {
+                state.userDetailsUnknownStatus = "succeeded";
+                state.userDetailsUnknown = action.payload;
+            })
+            .addCase(fetchUserDetailsUnknown.rejected, (state, action) => {
+                state.userDetailsUnknownStatus = "failed";
+                state.userDetailsUnknownError = action.payload;
+            })
     },
 });
 

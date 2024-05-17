@@ -306,3 +306,9 @@ def update_query(request, pk):
     query.is_resolved = True
     query.save()
     return Response({'message': 'Query updated successfully'})
+
+@api_view(['GET'])
+def get_user_details_unknown(request,pk):
+    user = CustomUser.objects.get(id=pk)
+    serializer = UserSerializer(user, many=False)
+    return Response(serializer.data)

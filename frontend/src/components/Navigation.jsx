@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "@/features/UserSlice";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import {
   Home,
   Image,
@@ -10,6 +10,7 @@ import {
   Clapperboard,
   PanelLeft,
   LogIn,
+  SquarePlus,
 } from "lucide-react";
 import Logo from "@/assets/Logo.svg";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,10 @@ import DarkModeToggle from "./DarkModeToggle";
 
 function Navigation() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const userInfo = useSelector((state) => state.user.userInfo);
+
   const handleLogout = () => {
     dispatch(logout());
   };
@@ -156,6 +160,27 @@ function Navigation() {
                     <TooltipContent side="right">Video</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <NavLink to="/create-post">
+                        {({ isActive }) => (
+                          <Button
+                            variant={`${isActive ? "default" : "ghost"}`}
+                            size="icon"
+                            className={`${
+                              !isActive &&
+                              "text-muted-foreground transition-colors hover:text-foreground"
+                            }`}
+                          >
+                            <SquarePlus />
+                          </Button>
+                        )}
+                      </NavLink>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">Create Post</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </>
             ) : (
               <TooltipProvider>
@@ -200,6 +225,11 @@ function Navigation() {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => navigate(`/profile/${userInfo.id}`)}
+                  >
+                    Profile
+                  </DropdownMenuItem>
                   <DropdownMenuItem>Settings</DropdownMenuItem>
                   <DropdownMenuItem>Support</DropdownMenuItem>
                   <DropdownMenuSeparator />
@@ -304,6 +334,20 @@ function Navigation() {
                         </Button>
                       )}
                     </NavLink>
+                    <NavLink to="/create-post">
+                      {({ isActive }) => (
+                        <Button
+                          variant={`${isActive ? "default" : "ghost"}`}
+                          className={`${
+                            !isActive &&
+                            "text-muted-foreground transition-colors hover:text-foreground"
+                          }`}
+                        >
+                          <SquarePlus className="mr-2 h-4 w-4" />
+                          Create Post
+                        </Button>
+                      )}
+                    </NavLink>
                   </>
                 ) : (
                   <NavLink to="/login">
@@ -342,6 +386,11 @@ function Navigation() {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => navigate(`/profile/${userInfo.id}`)}
+                  >
+                    Profile
+                  </DropdownMenuItem>
                   <DropdownMenuItem>Settings</DropdownMenuItem>
                   <DropdownMenuItem>Support</DropdownMenuItem>
                   <DropdownMenuSeparator />
