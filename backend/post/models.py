@@ -5,24 +5,47 @@ import uuid
 class TextPost(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     content = models.TextField(null=False, blank=False)
-    likes = models.IntegerField(default=0)
-    comments = models.IntegerField(default=0)
-    shares = models.IntegerField(default=0)
+    total_likes = models.IntegerField(default=0)
+    total_comments = models.IntegerField(default=0)
+    total_shares = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     user = models.ForeignKey('customuser.CustomUser', on_delete=models.CASCADE, related_name='text_posts')
 
     def __str__(self):
-        return self.content
+        return self.content[:20]
+    
+class Like(models.Model):
+    user = models.ForeignKey('customuser.CustomUser', on_delete=models.CASCADE)
+    post = models.ForeignKey(TextPost, on_delete=models.CASCADE, related_name='likes')
+    like = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('user', 'post')
+
+class Share(models.Model):
+    user = models.ForeignKey('customuser.CustomUser', on_delete=models.CASCADE)
+    post = models.ForeignKey(TextPost, on_delete=models.CASCADE, related_name='shares')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'post')
     
 class Comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     content = models.TextField(null=False, blank=False)
-    likes = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     user = models.ForeignKey('customuser.CustomUser', on_delete=models.CASCADE, related_name='user_comments')
-    post = models.ForeignKey('post.TextPost', on_delete=models.CASCADE, related_name='post_comments')
+    post = models.ForeignKey(TextPost, on_delete=models.CASCADE, related_name='post_comments')
 
     def __str__(self):
-        return self.content
+        return self.content[:20]
+    
+class CommentLike(models.Model):
+    user = models.ForeignKey('customuser.CustomUser', on_delete=models.CASCADE)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='likes')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'comment')

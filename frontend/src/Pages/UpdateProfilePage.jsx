@@ -2,7 +2,7 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchUserUpdate } from "@/features/UserSlice";
+import { fetchUserUpdate, resetUserUpdate } from "@/features/UserSlice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +16,7 @@ function UpdateProfilePage() {
   const userDetails = useSelector((state) => state.user.userDetails) || {};
   const userUpdateStatus = useSelector((state) => state.user.userUpdateStatus);
 
+  const [userName, setUserName] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -26,8 +27,10 @@ function UpdateProfilePage() {
   useEffect(() => {
     if (userUpdateStatus === "succeeded") {
       alert("User updated successfully");
+      dispatch(resetUserUpdate());
     } else if (userUpdateStatus === "failed") {
       alert("User update failed");
+      dispatch(resetUserUpdate());
     }
   }, [userUpdateStatus]);
 
@@ -39,6 +42,7 @@ function UpdateProfilePage() {
       setLastName(userDetails.last_name);
       setEmail(userDetails.email);
       setProfileImage(userDetails.profile_image);
+      setUserName(userDetails.user_name);
     }
   }, [userInfo, userDetails, userUpdateStatus]);
 
@@ -47,13 +51,13 @@ function UpdateProfilePage() {
     if (file.type.startsWith("image/")) {
       setProfileImage(file);
     } else {
-      toast.success("Please select an image file");
+      alert("Please select an image file");
     }
   };
 
   const updateHandler = (e) => {
     if (password !== confirmPassword) {
-      toast.warning("Passwords do not match");
+      alert("Passwords do not match");
     } else {
       dispatch(
         fetchUserUpdate({
@@ -98,6 +102,16 @@ function UpdateProfilePage() {
             <h3 className="text-center">
               if you don't want to change image or password just leave it blank
             </h3>
+            <div className="grid gap-2">
+              <Label htmlFor="userName">User Name</Label>
+              <Input
+                id="userName"
+                placeholder="User Name"
+                required
+                value={userName || ""}
+                onChange={(e) => setUserName(e.target.value)}
+              />
+            </div>
             <div className="grid gap-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">

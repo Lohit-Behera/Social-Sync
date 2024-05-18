@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "@/features/UserSlice";
 import { Link, NavLink, useNavigate } from "react-router-dom";
@@ -11,6 +11,7 @@ import {
   PanelLeft,
   LogIn,
   SquarePlus,
+  ImageMinus,
 } from "lucide-react";
 import Logo from "@/assets/Logo.svg";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import DarkModeToggle from "./DarkModeToggle";
+import { fetchDeleteImages } from "@/features/DeleteImages";
 
 function Navigation() {
   const dispatch = useDispatch();
@@ -39,18 +41,34 @@ function Navigation() {
 
   const userInfo = useSelector((state) => state.user.userInfo);
   const userDetails = useSelector((state) => state.user.userDetails);
+  const profileImage = userDetails ? userDetails.profile_image : "";
+  const deleteImageStatus = useSelector(
+    (state) => state.deleteImages.deleteImageStatus
+  );
+
+  useEffect(() => {
+    if (deleteImageStatus === "succeeded") {
+      alert("Images deleted successfully");
+    } else if (deleteImageStatus === "failed") {
+      alert("Something went wrong");
+    }
+  }, [deleteImageStatus]);
+
   const handleLogout = () => {
     dispatch(logout());
+  };
+  const deleteImagesHandler = () => {
+    dispatch(fetchDeleteImages());
   };
   return (
     <>
       <div className="hidden md:flex">
         <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
           <nav className="flex flex-col items-center gap-4 px-2">
-            <Link to="#" className="mt-2">
+            <Link to="/" className="mt-2">
               <Avatar className="hover:scale-110 duration-300">
                 <AvatarImage src={Logo} />
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarFallback>L</AvatarFallback>
               </Avatar>
             </Link>
             {userInfo ? (
@@ -208,6 +226,22 @@ function Navigation() {
           </nav>
           <nav className="mt-auto flex flex-col items-center gap-4 px-2 mb-2">
             <DarkModeToggle />
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={deleteImagesHandler}
+                  >
+                    <ImageMinus />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Delete Unused Images</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             {userInfo && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -217,7 +251,7 @@ function Navigation() {
                     className="overflow-hidden rounded-full"
                   >
                     <Avatar>
-                      <AvatarImage src={userDetails.profile_image} />
+                      <AvatarImage src={profileImage} />
                       <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                   </Button>
@@ -225,9 +259,7 @@ function Navigation() {
                 <DropdownMenuContent align="end">
                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    onClick={() => navigate(`/profile/${userInfo.id}`)}
-                  >
+                  <DropdownMenuItem onClick={() => navigate(`/profile`)}>
                     Profile
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/update-profile")}>
@@ -380,8 +412,8 @@ function Navigation() {
                     className="overflow-hidden rounded-full"
                   >
                     <Avatar>
-                      <AvatarImage src={userDetails.profile_image} />
-                      <AvatarFallback>CN</AvatarFallback>
+                      <AvatarImage src={profileImage} />
+                      <AvatarFallback>L</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>

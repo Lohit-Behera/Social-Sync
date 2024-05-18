@@ -32,6 +32,7 @@ function SignupPage() {
     }
   }, [registerStatus, navigate]);
 
+  const [userName, setUserName] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -47,6 +48,7 @@ function SignupPage() {
     } else {
       dispatch(
         fetchRegister({
+          user_name: userName,
           first_name: firstName,
           last_name: lastName,
           email: email,
@@ -64,6 +66,15 @@ function SignupPage() {
             <p className="text-balance text-muted-foreground">
               Enter your information to create an account
             </p>
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="userName">User Name</Label>
+            <Input
+              id="userName"
+              placeholder="User Name"
+              required
+              onChange={(e) => setUserName(e.target.value)}
+            />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">

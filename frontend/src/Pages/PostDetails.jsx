@@ -13,15 +13,21 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { fetchGetTextPost } from "@/features/TextPostSlice";
 import { Heart, MessageCircle, Send } from "lucide-react";
+import { fetchLike, resetLike } from "@/features/PostSlice";
 
 function PostDetails() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const { id } = useParams();
+  const userInfo = useSelector((state) => state.user.userInfo);
   const getTextPost = useSelector((state) => state.textPost.getTextPost) || {};
   const getTextPostStatus = useSelector(
     (state) => state.textPost.getTextPostStatus
   );
+  const postLike = useSelector((state) => state.post.postLike);
+
+  const postLikeStatus = useSelector((state) => state.post.postLikeStatus);
 
   const post = getTextPost ? getTextPost.post : {};
   const user = getTextPost ? getTextPost.user : {};
@@ -29,6 +35,29 @@ function PostDetails() {
   useEffect(() => {
     dispatch(fetchGetTextPost(id));
   }, [dispatch, id]);
+
+  useEffect(() => {
+    if (postLike.message === "Post liked") {
+      dispatch(fetchGetTextPost(id));
+      dispatch(resetLike());
+      alert("post liked successfully");
+    } else if (postLike.message === "Post unliked") {
+      dispatch(fetchGetTextPost(id));
+      dispatch(resetLike());
+      alert("post unliked successfully");
+    } else if (postLikeStatus === "failed") {
+      dispatch(resetLike());
+      alert("Something went wrong");
+    }
+  }, [postLikeStatus]);
+
+  const handleLike = () => {
+    if (userInfo) {
+      dispatch(fetchLike(id));
+    } else {
+      navigate("/login");
+    }
+  };
 
   return (
     <>
@@ -65,16 +94,16 @@ function PostDetails() {
               <CardFooter>
                 <div className="flex justify-end w-full space-x-4">
                   <div className="flex flex-col">
-                    <Heart />
-                    <p className="text-center">{post.likes}</p>
+                    <Heart onClick={handleLike} className="cursor-pointer" />
+                    <p className="text-center">{post.total_likes}</p>
                   </div>
                   <div className="flex flex-col">
                     <MessageCircle />
-                    <p className="text-center">{post.comments}</p>
+                    <p className="text-center">{post.total_comments}</p>
                   </div>
                   <div className="flex flex-col">
                     <Send />
-                    <p className="text-center">{post.shares}</p>
+                    <p className="text-center">{post.total_shares}</p>
                   </div>
                 </div>
               </CardFooter>

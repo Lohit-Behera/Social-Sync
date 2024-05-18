@@ -43,6 +43,7 @@ def register_user(request):
         if CustomUser.objects.filter(email=data['email']).exists():
             return Response({'massage': 'User with this email already exists'}, status=status.HTTP_400_BAD_REQUEST)
         
+        user_name = data['user_name']
         first_name_lower = data['first_name'].lower()
         first_name = first_name_lower.replace(' ', '').capitalize()
 
@@ -51,6 +52,7 @@ def register_user(request):
 
         email = data['email'].lower()
         user = CustomUser.objects.create(
+            user_name=user_name,
             first_name=first_name,
             last_name=last_name,
             email=email,

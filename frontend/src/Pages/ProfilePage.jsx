@@ -1,84 +1,33 @@
-import React, { useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import React from "react";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { fetchUserDetailsUnknown } from "@/features/UserSlice";
+import Profile from "@/components/Profile";
 
 function ProfilePage() {
   const dispatch = useDispatch();
-  const { id } = useParams();
-  const userDetailsUnknown =
-    useSelector((state) => state.user.userDetailsUnknown) || {};
-  const userDetailsUnknownStatus = useSelector(
-    (state) => state.user.userDetailsUnknownStatus
+  const navigate = useNavigate();
+
+  const userInfo = useSelector((state) => state.user.userInfo);
+  const userDetails = useSelector((state) => state.user.userDetails) || {};
+  const userDetailsStatus = useSelector(
+    (state) => state.user.userDetailsStatus
   );
 
   useEffect(() => {
-    if (id) {
-      dispatch(fetchUserDetailsUnknown(id));
+    if (!userInfo) {
+      navigate("/login");
     }
-  }, [id, dispatch]);
+  }, [userInfo, dispatch]);
+
   return (
     <>
-      {userDetailsUnknownStatus === "loading" ||
-      userDetailsUnknownStatus === "idle" ? (
-        <p>Loading...</p>
-      ) : userDetailsUnknownStatus === "failed" ? (
-        <p>Error</p>
+      {userDetailsStatus === "loading" || userDetailsStatus === "idle" ? (
+        <div>Loading...</div>
+      ) : userDetailsStatus === "failed" ? (
+        <div>Error</div>
       ) : (
-        <>
-          <div className="w-[96%] md:w-[80%] lg:w-[70%] mx-auto mt-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex flex-col justify-center space-y-2">
-                  <Avatar className="mx-auto w-24 h-24">
-                    <AvatarImage src={userDetailsUnknown.profile_image} />
-                    <AvatarFallback>CN</AvatarFallback>
-                  </Avatar>
-                  <h3 className="text-lg md:text-xl font-semibold text-center">
-                    {userDetailsUnknown.user_name}
-                  </h3>
-                </CardTitle>
-                <CardDescription>
-                  {userDetailsUnknown.first_name} {userDetailsUnknown.last_name}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-3">
-                  <div>
-                    <h3 className="text-lg md:text-xl font-semibold mt-2">
-                      Followers
-                    </h3>
-                    <p>{userDetailsUnknown.followers.length}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-lg md:text-xl font-semibold mt-2">
-                      Following
-                    </h3>
-                    <p>{userDetailsUnknown.following.length}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-lg md:text-xl font-semibold mt-2">
-                      Post
-                    </h3>
-                    <p>{userDetailsUnknown.followers.length}</p>
-                  </div>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <h3 className="text-lg md:text-xl font-semibold">Posts</h3>
-              </CardFooter>
-            </Card>
-          </div>
-        </>
+        <Profile user={userDetails} />
       )}
     </>
   );
