@@ -63,11 +63,46 @@ def like_unlike_post(request, pk):
     
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_text_posts(request):
+def get_all_text_posts(request):
     try:
         posts = TextPost.objects.all()
         serializer = TextPostSerializer(posts, many=True)
         return Response(serializer.data)
+    except Exception as e:
+        print(e)
+        return Response({'message': 'An error occurred while processing your request'}, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_posts(request, pk):
+    try:
+        post = TextPost.objects.filter(user=pk)
+        serializer = TextPostSerializer(post, many=True)
+        return Response(serializer.data)
+    except Exception as e:
+        print(e)
+        return Response({'message': 'An error occurred while processing your request'}, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def edit_text_post(request, pk):
+    try:
+        post = TextPost.objects.get(id=pk)
+        data = request.data
+        post.content = data['content']
+        post.save()
+        return Response({'message': 'Post updated successfully'}, status=status.HTTP_200_OK)
+    except Exception as e:
+        print(e)
+        return Response({'message': 'An error occurred while processing your request'}, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_text_post(request, pk):
+    try:
+        post = TextPost.objects.get(id=pk)
+        post.delete()
+        return Response({'message': 'Post deleted successfully'}, status=status.HTTP_200_OK)
     except Exception as e:
         print(e)
         return Response({'message': 'An error occurred while processing your request'}, status=status.HTTP_400_BAD_REQUEST)

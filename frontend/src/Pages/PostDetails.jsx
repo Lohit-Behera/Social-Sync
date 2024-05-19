@@ -10,9 +10,26 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { fetchGetTextPost } from "@/features/TextPostSlice";
-import { Heart, MessageCircle, Send } from "lucide-react";
+import {
+  fetchGetTextPost,
+  fetchDeleteTextPost,
+  resetDeleteTextPost,
+} from "@/features/TextPostSlice";
+import { Button } from "@/components/ui/button";
+import { Heart, MessageCircle, Send, Pencil, Trash } from "lucide-react";
 import { fetchLike, resetLike } from "@/features/PostSlice";
 
 function PostDetails() {
@@ -26,8 +43,10 @@ function PostDetails() {
     (state) => state.textPost.getTextPostStatus
   );
   const postLike = useSelector((state) => state.post.postLike);
-
   const postLikeStatus = useSelector((state) => state.post.postLikeStatus);
+  const deleteTextPostStatus = useSelector(
+    (state) => state.textPost.deleteTextPostStatus
+  );
 
   useEffect(() => {
     dispatch(fetchGetTextPost(id));
@@ -48,9 +67,27 @@ function PostDetails() {
     }
   }, [postLikeStatus]);
 
+  useEffect(() => {
+    if (deleteTextPostStatus === "succeeded") {
+      navigate("/text-post");
+      dispatch(resetDeleteTextPost());
+      alert("Post deleted successfully");
+    } else if (deleteTextPostStatus === "failed") {
+      alert("Something went wrong");
+    }
+  }, [deleteTextPostStatus]);
+
   const handleLike = () => {
     if (userInfo) {
       dispatch(fetchLike(id));
+    } else {
+      navigate("/login");
+    }
+  };
+
+  const handleDelete = () => {
+    if (userInfo) {
+      dispatch(fetchDeleteTextPost(id));
     } else {
       navigate("/login");
     }
@@ -68,18 +105,55 @@ function PostDetails() {
           <div className="w-[90%] md:w-[80%] lg:w-[70%] mx-auto">
             <Card>
               <CardHeader>
-                <CardTitle className="flex space-x-2">
-                  <Link to={`/profile/${getTextPost.user}`}>
-                    <Avatar>
-                      <AvatarImage src={getTextPost.profile_image} />
-                      <AvatarFallback>P</AvatarFallback>
-                    </Avatar>
-                  </Link>
-                  <Link to={`/profile/${getTextPost.user}`}>
-                    <h3 className="text-lg md:text-xl font-semibold mt-2">
-                      {getTextPost.user_name}
-                    </h3>
-                  </Link>
+                <CardTitle className="flex justify-between ">
+                  <div className="flex space-x-2">
+                    <Link to={`/profile/${getTextPost.user}`}>
+                      <Avatar>
+                        <AvatarImage src={getTextPost.profile_image} />
+                        <AvatarFallback>P</AvatarFallback>
+                      </Avatar>
+                    </Link>
+                    <Link to={`/profile/${getTextPost.user}`}>
+                      <h3 className="text-lg md:text-xl font-semibold mt-2">
+                        {getTextPost.user_name}
+                      </h3>
+                    </Link>
+                  </div>
+                  {userInfo?.id === getTextPost.user && (
+                    <div className="flex space-x-2">
+                      <Button size="icon" variant="outline">
+                        <Pencil />
+                      </Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button size="icon" variant="outline">
+                            <Trash />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>
+                              Are you absolutely sure?
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will
+                              permanently delete your Post and remove your data
+                              from our servers.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDelete(getTextPost.id)}
+                              variant="destructive"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  )}
                 </CardTitle>
                 <CardDescription></CardDescription>
               </CardHeader>

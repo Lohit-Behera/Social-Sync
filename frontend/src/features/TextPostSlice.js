@@ -73,7 +73,7 @@ export const fetchGetAllTextPost = createAsyncThunk('get/all/textPost', async (_
     }
 });
 
-export const fetchDeleteTextPost = createAsyncThunk('delete/textPost', async (id, { rejectWithValue, getState }) => {
+export const fetchGetUserAllTextPost = createAsyncThunk('get/user/all/textPost', async (id, { rejectWithValue, getState }) => {
     try {
         const { user: { userInfo } = {} } = getState();
         const config = {
@@ -82,8 +82,8 @@ export const fetchDeleteTextPost = createAsyncThunk('delete/textPost', async (id
                 'Authorization': `Bearer ${userInfo.token}`,
             },
         };
-        const { data } = await axios.delete(
-            `/api/post/delete/text/post/${id}/`,
+        const { data } = await axios.get(
+            `/api/post/get/user/${id}/`,
             config
         );
         return data;
@@ -96,6 +96,28 @@ export const fetchDeleteTextPost = createAsyncThunk('delete/textPost', async (id
     }
 })
 
+export const fetchDeleteTextPost = createAsyncThunk('delete/textPost', async (id, { rejectWithValue, getState }) => {
+    try {
+        const { user: { userInfo } = {} } = getState();
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userInfo.token}`,
+            },
+        };
+        const { data } = await axios.delete(
+            `/api/post/delete/text/${id}/`,
+            config
+        );
+        return data;
+    } catch (error) {
+        return rejectWithValue(
+            error.response && error.response.data.message
+                ? error.response.data.message
+                : error.message
+        );
+    }
+})
 
 const textPostSlice = createSlice({
     name: "textPost",
@@ -111,6 +133,14 @@ const textPostSlice = createSlice({
         getAllTextPost: {},
         getAllTextPostStatus: 'idle',
         getAllTextPostError: null,
+
+        getUserAllTextPost: {},
+        getUserAllTextPostStatus: 'idle',
+        getUserAllTextPostError: null,
+
+        deleteTextPost: null,
+        deleteTextPostStatus: 'idle',
+        deleteTextPostError: null,
     },
     reducers: {
         resetCreateTextPost: (state) => {
@@ -118,6 +148,11 @@ const textPostSlice = createSlice({
             state.createTextPostStatus = 'idle';
             state.createTextPostError = null;
         },
+        resetDeleteTextPost: (state) => {
+            state.deleteTextPost = null;
+            state.deleteTextPostStatus = 'idle';
+            state.deleteTextPostError = null;
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -156,8 +191,32 @@ const textPostSlice = createSlice({
                 state.getAllTextPostStatus = 'failed';
                 state.getAllTextPostError = action.payload;
             })
+
+            .addCase(fetchGetUserAllTextPost.pending, (state) => {
+                state.getUserAllTextPostStatus = 'loading';
+            })
+            .addCase(fetchGetUserAllTextPost.fulfilled, (state, action) => {
+                state.getUserAllTextPostStatus = 'succeeded';
+                state.getUserAllTextPost = action.payload;
+            })
+            .addCase(fetchGetUserAllTextPost.rejected, (state, action) => {
+                state.getUserAllTextPostStatus = 'failed';
+                state.getUserAllTextPostError = action.payload;
+            })
+
+            .addCase(fetchDeleteTextPost.pending, (state) => {
+                state.deleteTextPostStatus = 'loading';
+            })
+            .addCase(fetchDeleteTextPost.fulfilled, (state, action) => {
+                state.deleteTextPostStatus = 'succeeded';
+                state.deleteTextPost = action.payload;
+            })
+            .addCase(fetchDeleteTextPost.rejected, (state, action) => {
+                state.deleteTextPostStatus = 'failed';
+                state.deleteTextPostError = action.payload;
+            })
     },
 });
 
-export const { resetCreateTextPost } = textPostSlice.actions;
+export const { resetCreateTextPost, resetDeleteTextPost } = textPostSlice.actions;
 export default textPostSlice.reducer;

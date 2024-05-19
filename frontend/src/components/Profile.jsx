@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import {
   Card,
@@ -16,6 +16,7 @@ import {
   fetchGetFollow,
   resetFollow,
 } from "@/features/UserFollowSlice";
+import { fetchGetUserAllTextPost } from "@/features/TextPostSlice";
 
 function Profile({ user = {} }) {
   const dispatch = useDispatch();
@@ -36,6 +37,15 @@ function Profile({ user = {} }) {
   const userFollowing =
     useSelector((state) => state.userFollow.getFollow.following) || [];
   const followStatus = useSelector((state) => state.userFollow.followStatus);
+  const getUserAllTextPostStatus = useSelector(
+    (state) => state.textPost.getUserAllTextPostStatus
+  );
+  const getUserAllTextPost =
+    useSelector((state) => state.textPost.getUserAllTextPost) || [];
+
+  useEffect(() => {
+    dispatch(fetchGetUserAllTextPost(id));
+  }, [dispatch]);
 
   useEffect(() => {
     if (followStatus === "succeeded") {
@@ -55,63 +65,87 @@ function Profile({ user = {} }) {
 
   return (
     <div className="w-[96%] md:w-[80%] lg:w-[70%] mx-auto mt-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex justify-between">
-            <div className="flex space-x-2">
-              <Avatar>
-                <AvatarImage src={profile_image} />
-                <AvatarFallback>P</AvatarFallback>
-              </Avatar>
-              <h3 className="text-base md:text-lg font-semibold mt-2">
-                {user_name}
-              </h3>
+      {getUserAllTextPostStatus === "loading" ? (
+        <p>Loading...</p>
+      ) : getUserAllTextPostStatus === "failed" ? (
+        <p>Error</p>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex justify-between">
+              <div className="flex space-x-2">
+                <Avatar className="w-16 h-16">
+                  <AvatarImage src={profile_image} />
+                  <AvatarFallback>P</AvatarFallback>
+                </Avatar>
+                <h3 className="text-base md:text-lg font-semibold mt-4">
+                  {user_name}
+                </h3>
+              </div>
+              {id === userInfo.id ? null : (
+                <Button
+                  className="text-xs md:text-sm mt-2.5"
+                  size="sm"
+                  variant={userFollowing.includes(id) ? "secondary" : "default"}
+                  onClick={() => handleLike(id)}
+                >
+                  {userFollowing.includes(id)
+                    ? "Unfollow"
+                    : followStatus === "loading"
+                    ? "loading"
+                    : "Follow"}
+                </Button>
+              )}
+            </CardTitle>
+            <CardDescription>
+              {first_name} {last_name}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-3">
+              <div>
+                <p className="text-lg md:text-xl font-semibold mt-2 text-center">
+                  Followers
+                </p>
+                <p className="text-center">{followers.length}</p>
+              </div>
+              <div>
+                <p className="text-lg md:text-xl font-semibold mt-2 text-center">
+                  Following
+                </p>
+                <p className="text-center">{following.length}</p>
+              </div>
+              <div>
+                <p className="text-lg md:text-xl font-semibold mt-2 text-center">
+                  Post
+                </p>
+                <p className="text-center">{total_posts}</p>
+              </div>
             </div>
-            {id === userInfo.id ? null : (
-              <Button
-                className="text-xs md:text-sm"
-                size="sm"
-                variant={userFollowing.includes(id) ? "secondary" : "default"}
-                onClick={() => handleLike(id)}
-              >
-                {userFollowing.includes(id)
-                  ? "Unfollow"
-                  : followStatus === "loading"
-                  ? "loading"
-                  : "Follow"}
-              </Button>
-            )}
-          </CardTitle>
-          <CardDescription className="text-center">
-            {first_name} {last_name}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-3">
-            <div>
-              <p className="text-lg md:text-xl font-semibold mt-2 text-center">
-                Followers
-              </p>
-              <p className="text-center">{followers.length}</p>
+          </CardContent>
+          <CardFooter className="flex flex-col">
+            <p className="text-lg md:text-xl font-semibold text-center my-4">
+              Posts
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {Array.isArray(getUserAllTextPost) &&
+                getUserAllTextPost.map((post) => (
+                  <Card key={post.id} className="bg-muted">
+                    <CardHeader>
+                      <CardTitle>
+                        <Link to={`/post/${post.id}`}>
+                          <p className="line-clamp-1 text-xs md:text-sm lg:text-base text-cent">
+                            {post.content}
+                          </p>
+                        </Link>
+                      </CardTitle>
+                    </CardHeader>
+                  </Card>
+                ))}
             </div>
-            <div>
-              <p className="text-lg md:text-xl font-semibold mt-2 text-center">
-                Following
-              </p>
-              <p className="text-center">{following.length}</p>
-            </div>
-            <div>
-              <p className="text-lg md:text-xl font-semibold mt-2 text-center">
-                Post
-              </p>
-              <p className="text-center">{total_posts}</p>
-            </div>
-          </div>
-        </CardContent>
-        <CardFooter>
-          <p className="text-lg md:text-xl font-semibold">Posts</p>
-        </CardFooter>
-      </Card>
+          </CardFooter>
+        </Card>
+      )}
     </div>
   );
 }

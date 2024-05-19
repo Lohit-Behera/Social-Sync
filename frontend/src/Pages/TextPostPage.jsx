@@ -20,6 +20,7 @@ import {
   resetFollow,
 } from "@/features/UserFollowSlice";
 import { fetchUserDetails } from "@/features/UserSlice";
+import { AlignJustify } from "lucide-react";
 
 function TextPostPage() {
   const dispatch = useDispatch();
@@ -107,7 +108,6 @@ function TextPostPage() {
                       </Button>
                     )}
                   </CardTitle>
-                  <CardDescription></CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Link to={`/post/${post.id}`}>

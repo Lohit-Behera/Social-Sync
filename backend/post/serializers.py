@@ -10,7 +10,7 @@ class TextPostSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_user_name(self, obj):
-        return obj.user.user_name  # Correct field name
+        return obj.user.user_name
 
     def get_profile_image(self, obj):
-        return obj.user.profile_image.url if obj.user.profile_image else None  # Handle profile image URL
+        return obj.user.profile_image.url if obj.user.profile_image else None
