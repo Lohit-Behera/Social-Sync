@@ -4,6 +4,7 @@ import { Outlet } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import Navigation from "./components/Navigation";
 import { fetchUserDetails } from "./features/UserSlice";
+import { fetchGetFollow } from "./features/UserFollowSlice";
 
 function Layout() {
   const dispatch = useDispatch();
@@ -12,10 +13,14 @@ function Layout() {
   const userDetailsStatus = useSelector(
     (state) => state.user.userDetailsStatus
   );
+  const getFollowStatus = useSelector(
+    (state) => state.userFollow.getFollowStatus
+  );
 
   useEffect(() => {
     if (userInfo) {
       dispatch(fetchUserDetails(userInfo.id));
+      dispatch(fetchGetFollow(userInfo.id));
     }
   }, [userInfo, dispatch]);
   return (

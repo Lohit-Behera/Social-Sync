@@ -7,6 +7,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.tokens import default_token_generator
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from django.shortcuts import get_object_or_404
 from backend.settings import EMAIL_HOST_USER, MEDIA_ROOT, BASE_DIR
 
 from rest_framework import status
@@ -17,7 +18,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 import os
 
-from .serializers import UserSerializerWithToken, UserSerializer, ContactUsSerializer
+from .serializers import UserSerializerWithToken, UserSerializer, ContactUsSerializer, UserFollowSerializer
 
 from .models import CustomUser, EmailVerificationToken, ContactUs
 
@@ -314,3 +315,32 @@ def get_user_details_unknown(request,pk):
     user = CustomUser.objects.get(id=pk)
     serializer = UserSerializer(user, many=False)
     return Response(serializer.data)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def follow_user(request, user_id):
+    try:
+        user_to_follow = get_object_or_404(CustomUser, id=user_id)
+        if user_to_follow == request.user:
+            return Response({"massage": "You cannot follow yourself."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if user_to_follow in request.user.following.all():
+            request.user.following.remove(user_to_follow)
+            user_to_follow.followers.remove(request.user)
+            return Response({"massage": f"You are unfollowing {user_to_follow.user_name}."}, status=status.HTTP_200_OK)
+        
+        request.user.following.add(user_to_follow)
+        user_to_follow.followers.add(request.user)
+        return Response({"success": f"You are now following {user_to_follow.user_name}"}, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_follow(request, user_id):
+    user = CustomUser.objects.get(id=user_id)
+    serializer = UserFollowSerializer(user, many=False)
+    return Response(serializer.data, status=status.HTTP_200_OK)

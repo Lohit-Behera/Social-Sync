@@ -11,9 +11,18 @@ class TextPost(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     user = models.ForeignKey('customuser.CustomUser', on_delete=models.CASCADE, related_name='text_posts')
+    
 
     def __str__(self):
         return self.content[:20]
+    
+    @property
+    def user_name(self):
+        return self.user.user_name
+    
+    @property
+    def profile_image(self):
+        return self.user.profile_image
     
 class Like(models.Model):
     user = models.ForeignKey('customuser.CustomUser', on_delete=models.CASCADE)

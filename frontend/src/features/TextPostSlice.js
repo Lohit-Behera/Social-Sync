@@ -49,7 +49,55 @@ export const fetchGetTextPost = createAsyncThunk('get/textPost', async (id, { re
     }
 });
 
-export const textPostSlice = createSlice({
+export const fetchGetAllTextPost = createAsyncThunk('get/all/textPost', async (_, { rejectWithValue, getState }) => {
+    try {
+        const { user: { userInfo } = {} } = getState();
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userInfo.token}`,
+            },
+        };
+        const { data } = await axios.get(
+            '/api/post/get/all/text/',
+            config
+        );
+
+        return data;
+    } catch (error) {
+        return rejectWithValue(
+            error.response && error.response.data.message
+                ? error.response.data.message
+                : error.message
+        );
+    }
+});
+
+export const fetchDeleteTextPost = createAsyncThunk('delete/textPost', async (id, { rejectWithValue, getState }) => {
+    try {
+        const { user: { userInfo } = {} } = getState();
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userInfo.token}`,
+            },
+        };
+        const { data } = await axios.delete(
+            `/api/post/delete/text/post/${id}/`,
+            config
+        );
+        return data;
+    } catch (error) {
+        return rejectWithValue(
+            error.response && error.response.data.message
+                ? error.response.data.message
+                : error.message
+        );
+    }
+})
+
+
+const textPostSlice = createSlice({
     name: "textPost",
     initialState: {
         createTextPost: {},
@@ -59,6 +107,10 @@ export const textPostSlice = createSlice({
         getTextPost: {},
         getTextPostStatus: 'idle',
         getTextPostError: null,
+
+        getAllTextPost: {},
+        getAllTextPostStatus: 'idle',
+        getAllTextPostError: null,
     },
     reducers: {
         resetCreateTextPost: (state) => {
@@ -91,6 +143,18 @@ export const textPostSlice = createSlice({
             .addCase(fetchGetTextPost.rejected, (state, action) => {
                 state.getTextPostStatus = 'failed';
                 state.getTextPostError = action.payload;
+            })
+
+            .addCase(fetchGetAllTextPost.pending, (state) => {
+                state.getAllTextPostStatus = 'loading';
+            })
+            .addCase(fetchGetAllTextPost.fulfilled, (state, action) => {
+                state.getAllTextPostStatus = 'succeeded';
+                state.getAllTextPost = action.payload;
+            })
+            .addCase(fetchGetAllTextPost.rejected, (state, action) => {
+                state.getAllTextPostStatus = 'failed';
+                state.getAllTextPostError = action.payload;
             })
     },
 });

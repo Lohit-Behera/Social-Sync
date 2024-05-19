@@ -19,4 +19,7 @@ urlpatterns = [
     path('contactus/<str:pk>/', views.get_query, name='get_query'),
     path('contactus/update/<str:pk>/', views.update_query, name='update_query'),
     path('details/unknown/<str:pk>/', views.get_user_details_unknown, name='get_user_details_unknown'),
+    
+    path('follow/<uuid:user_id>/', views.follow_user, name='follow_user'),
+    path('list/follow/<uuid:user_id>/', views.list_follow, name='list_follow'),
 ]

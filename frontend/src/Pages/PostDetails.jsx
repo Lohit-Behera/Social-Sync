@@ -29,9 +29,6 @@ function PostDetails() {
 
   const postLikeStatus = useSelector((state) => state.post.postLikeStatus);
 
-  const post = getTextPost ? getTextPost.post : {};
-  const user = getTextPost ? getTextPost.user : {};
-
   useEffect(() => {
     dispatch(fetchGetTextPost(id));
   }, [dispatch, id]);
@@ -72,38 +69,36 @@ function PostDetails() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex space-x-2">
-                  <Link to={`/profile/${user.id}`}>
+                  <Link to={`/profile/${getTextPost.user}`}>
                     <Avatar>
-                      <AvatarImage src={user.profile_image} />
-                      <AvatarFallback>CN</AvatarFallback>
+                      <AvatarImage src={getTextPost.profile_image} />
+                      <AvatarFallback>P</AvatarFallback>
                     </Avatar>
                   </Link>
-                  <Link to={`/profile/${user.id}`}>
+                  <Link to={`/profile/${getTextPost.user}`}>
                     <h3 className="text-lg md:text-xl font-semibold mt-2">
-                      {user.user_name}
+                      {getTextPost.user_name}
                     </h3>
                   </Link>
                 </CardTitle>
-                <CardDescription>
-                  {user.first_name} {user.last_name}
-                </CardDescription>
+                <CardDescription></CardDescription>
               </CardHeader>
               <CardContent>
-                <p>{post.content}</p>
+                <p>{getTextPost.content}</p>
               </CardContent>
               <CardFooter>
                 <div className="flex justify-end w-full space-x-4">
                   <div className="flex flex-col">
                     <Heart onClick={handleLike} className="cursor-pointer" />
-                    <p className="text-center">{post.total_likes}</p>
+                    <p className="text-center">{getTextPost.total_likes}</p>
                   </div>
                   <div className="flex flex-col">
                     <MessageCircle />
-                    <p className="text-center">{post.total_comments}</p>
+                    <p className="text-center">{getTextPost.total_comments}</p>
                   </div>
                   <div className="flex flex-col">
                     <Send />
-                    <p className="text-center">{post.total_shares}</p>
+                    <p className="text-center">{getTextPost.total_shares}</p>
                   </div>
                 </div>
               </CardFooter>

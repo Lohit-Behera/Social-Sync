@@ -118,7 +118,7 @@ function Navigation() {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <NavLink to="/text">
+                      <NavLink to="/text-post">
                         {({ isActive }) => (
                           <Button
                             variant={`${isActive ? "default" : "ghost"}`}
@@ -324,7 +324,7 @@ function Navigation() {
                       )}
                     </NavLink>
 
-                    <NavLink to="/text">
+                    <NavLink to="/text-post">
                       {({ isActive }) => (
                         <Button
                           variant={`${isActive ? "default" : "ghost"}`}

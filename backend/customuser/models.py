@@ -10,6 +10,7 @@ from PIL import Image
 
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
+from post.models import TextPost
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -64,6 +65,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
             img.thumbnail(max_size)
             img.save(self.profile_image.path)
+            
+    @property
+    def total_posts(self):
+        return TextPost.objects.filter(user=self).count()
 
 class EmailVerificationToken(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)

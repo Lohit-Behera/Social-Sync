@@ -31,13 +31,11 @@ def create_text_post(request):
 def get_text_post(request,pk):
     try:
         text_post = TextPost.objects.get(id=pk)
-        user = CustomUser.objects.get(id=text_post.user.id)
         likes_count = Like.objects.filter(post=text_post.id).count()
         text_post.total_likes = likes_count
         text_post.save()
-        user_serializer = PostUserDetailSerializer(user, many=False)
         serializer = TextPostSerializer(text_post, many=False)
-        return Response({'post': serializer.data, 'user' : user_serializer.data})
+        return Response(serializer.data)
     except Exception as e:
         print(e)
         return Response({'message': 'An error occurred while processing your request'}, status=status.HTTP_400_BAD_REQUEST)
@@ -59,6 +57,17 @@ def like_unlike_post(request, pk):
             like_obj.save()
             return Response({'message': 'Post liked'}, status=status.HTTP_200_OK)
     
+    except Exception as e:
+        print(e)
+        return Response({'message': 'An error occurred while processing your request'}, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_text_posts(request):
+    try:
+        posts = TextPost.objects.all()
+        serializer = TextPostSerializer(posts, many=True)
+        return Response(serializer.data)
     except Exception as e:
         print(e)
         return Response({'message': 'An error occurred while processing your request'}, status=status.HTTP_400_BAD_REQUEST)

@@ -12,12 +12,16 @@ function OtherProfile() {
   const userDetailsUnknownStatus = useSelector(
     (state) => state.user.userDetailsUnknownStatus
   );
+  const followStatus = useSelector((state) => state.userFollow.followStatus);
 
   useEffect(() => {
     if (id) {
+      if (followStatus === "succeeded" || followStatus === "idle") {
+        dispatch(fetchUserDetailsUnknown(id));
+      }
       dispatch(fetchUserDetailsUnknown(id));
     }
-  }, [id, dispatch]);
+  }, [id, dispatch, followStatus]);
   return (
     <>
       {userDetailsUnknownStatus === "loading" ||
