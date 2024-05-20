@@ -16,6 +16,7 @@ import OtherProfile from "./Pages/OtherProfilePage";
 import UpdateProfilePage from "./Pages/UpdateProfilePage";
 import ProfilePage from "./Pages/ProfilePage";
 import TextPostPage from "./Pages/TextPostPage";
+import EditPost from "./Pages/EditPost";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -29,6 +30,7 @@ const router = createBrowserRouter(
       <Route path="/profile/:id" element={<OtherProfile />} />
       <Route path="/update-profile" element={<UpdateProfilePage />} />
       <Route path="/text-post" element={<TextPostPage />} />
+      <Route path="/edit-post/:id/:type" element={<EditPost />} />
     </Route>
   )
 );

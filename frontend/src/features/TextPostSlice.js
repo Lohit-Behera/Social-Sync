@@ -119,6 +119,30 @@ export const fetchDeleteTextPost = createAsyncThunk('delete/textPost', async (id
     }
 })
 
+export const fetchEditTextPost = createAsyncThunk('edit/textPost', async (textPost, { rejectWithValue, getState }) => {
+    try {
+        const { user: { userInfo } = {} } = getState();
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userInfo.token}`,
+            },
+        };
+        const { data } = await axios.put(
+            `/api/post/edit/text/${textPost.id}/`,
+            textPost,
+            config
+        );
+        return data;
+    } catch (error) {
+        return rejectWithValue(
+            error.response && error.response.data.message
+                ? error.response.data.message
+                : error.message
+        );
+    }
+})
+
 const textPostSlice = createSlice({
     name: "textPost",
     initialState: {
@@ -141,6 +165,10 @@ const textPostSlice = createSlice({
         deleteTextPost: null,
         deleteTextPostStatus: 'idle',
         deleteTextPostError: null,
+
+        editTextPost: null,
+        editTextPostStatus: 'idle',
+        editTextPostError: null,
     },
     reducers: {
         resetCreateTextPost: (state) => {
@@ -152,10 +180,16 @@ const textPostSlice = createSlice({
             state.deleteTextPost = null;
             state.deleteTextPostStatus = 'idle';
             state.deleteTextPostError = null;
+        },
+        resetEditTextPost: (state) => {
+            state.editTextPost = null;
+            state.editTextPostStatus = 'idle';
+            state.editTextPostError = null;
         }
     },
     extraReducers: (builder) => {
         builder
+        // Create Text Post
             .addCase(fetchCreateTextPost.pending, (state) => {
                 state.createTextPostStatus = 'loading';
             })
@@ -168,6 +202,8 @@ const textPostSlice = createSlice({
                 state.createTextPostError = action.payload;
             })
 
+        // Get Text Post
+
             .addCase(fetchGetTextPost.pending, (state) => {
                 state.getTextPostStatus = 'loading';
             })
@@ -179,7 +215,7 @@ const textPostSlice = createSlice({
                 state.getTextPostStatus = 'failed';
                 state.getTextPostError = action.payload;
             })
-
+            // Get All Text Post
             .addCase(fetchGetAllTextPost.pending, (state) => {
                 state.getAllTextPostStatus = 'loading';
             })
@@ -192,6 +228,7 @@ const textPostSlice = createSlice({
                 state.getAllTextPostError = action.payload;
             })
 
+            // Get User All Text Post
             .addCase(fetchGetUserAllTextPost.pending, (state) => {
                 state.getUserAllTextPostStatus = 'loading';
             })
@@ -204,6 +241,7 @@ const textPostSlice = createSlice({
                 state.getUserAllTextPostError = action.payload;
             })
 
+            // Delete Text Post
             .addCase(fetchDeleteTextPost.pending, (state) => {
                 state.deleteTextPostStatus = 'loading';
             })
@@ -215,8 +253,21 @@ const textPostSlice = createSlice({
                 state.deleteTextPostStatus = 'failed';
                 state.deleteTextPostError = action.payload;
             })
+
+            // Edit Text Post
+            .addCase(fetchEditTextPost.pending, (state) => {
+                state.editTextPostStatus = 'loading';
+            })
+            .addCase(fetchEditTextPost.fulfilled, (state, action) => {
+                state.editTextPostStatus = 'succeeded';
+                state.editTextPost = action.payload;
+            })
+            .addCase(fetchEditTextPost.rejected, (state, action) => {
+                state.editTextPostStatus = 'failed';
+                state.editTextPostError = action.payload;
+            })
     },
 });
 
-export const { resetCreateTextPost, resetDeleteTextPost } = textPostSlice.actions;
+export const { resetCreateTextPost, resetDeleteTextPost, resetEditTextPost } = textPostSlice.actions;
 export default textPostSlice.reducer;

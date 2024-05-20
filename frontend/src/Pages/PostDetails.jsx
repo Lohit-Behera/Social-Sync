@@ -30,7 +30,8 @@ import {
 } from "@/features/TextPostSlice";
 import { Button } from "@/components/ui/button";
 import { Heart, MessageCircle, Send, Pencil, Trash } from "lucide-react";
-import { fetchLike, resetLike } from "@/features/PostSlice";
+import { fetchLike } from "@/features/PostSlice";
+import Comments from "@/components/Comments";
 
 function PostDetails() {
   const dispatch = useDispatch();
@@ -108,7 +109,7 @@ function PostDetails() {
                 <CardTitle className="flex justify-between ">
                   <div className="flex space-x-2">
                     <Link to={`/profile/${getTextPost.user}`}>
-                      <Avatar>
+                      <Avatar className="w-12 h-12">
                         <AvatarImage src={getTextPost.profile_image} />
                         <AvatarFallback>P</AvatarFallback>
                       </Avatar>
@@ -121,7 +122,13 @@ function PostDetails() {
                   </div>
                   {userInfo?.id === getTextPost.user && (
                     <div className="flex space-x-2">
-                      <Button size="icon" variant="outline">
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        onClick={() =>
+                          navigate(`/edit-post/${getTextPost.id}/text`)
+                        }
+                      >
                         <Pencil />
                       </Button>
                       <AlertDialog>
@@ -144,6 +151,7 @@ function PostDetails() {
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
                             <AlertDialogAction
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                               onClick={() => handleDelete(getTextPost.id)}
                               variant="destructive"
                             >
@@ -161,21 +169,30 @@ function PostDetails() {
                 <p>{getTextPost.content}</p>
               </CardContent>
               <CardFooter>
-                <div className="flex justify-end w-full space-x-4">
-                  <div className="flex flex-col">
-                    <Heart onClick={handleLike} className="cursor-pointer" />
-                    <p className="text-center">{getTextPost.total_likes}</p>
-                  </div>
-                  <div className="flex flex-col">
-                    <MessageCircle />
-                    <p className="text-center">{getTextPost.total_comments}</p>
-                  </div>
-                  <div className="flex flex-col">
-                    <Send />
-                    <p className="text-center">{getTextPost.total_shares}</p>
+                <div className="flex justify-between w-full">
+                  <p className="text-xs text-muted-foreground">
+                    Created at: {getTextPost.created_at.slice(0, 10)}{" "}
+                    {getTextPost.edited && "(edited)"}
+                  </p>
+                  <div className="flex space-x-4">
+                    <div className="flex flex-col">
+                      <Heart onClick={handleLike} className="cursor-pointer" />
+                      <p className="text-center">{getTextPost.total_likes}</p>
+                    </div>
+                    <div className="flex flex-col">
+                      <MessageCircle />
+                      <p className="text-center">
+                        {getTextPost.total_comments}
+                      </p>
+                    </div>
+                    <div className="flex flex-col">
+                      <Send />
+                      <p className="text-center">{getTextPost.total_shares}</p>
+                    </div>
                   </div>
                 </div>
               </CardFooter>
+              <Comments id={id} />
             </Card>
           </div>
         </>
