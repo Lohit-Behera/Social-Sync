@@ -151,107 +151,115 @@ function Comments({ id }) {
       ) : getAllCommentsStatus === "failed" ? (
         <p>Error</p>
       ) : (
-        <CardFooter className="w-full flex flex-col space-y-3">
-          <h1 className="text-lg font-semibold">Comments</h1>
-          {getAllComments.map((comment) => (
-            <div
-              key={comment.id}
-              className="flex flex-col space-y-3  bg-muted w-full rounded-lg p-4"
-            >
-              <div className="flex justify-between">
-                <div className="flex space-x-2">
-                  <Link to={`/profile/${comment.user}`}>
-                    <Avatar className="w-8 h-8">
-                      <AvatarImage src={comment.profile_image} />
-                      <AvatarFallback>P</AvatarFallback>
-                    </Avatar>
-                  </Link>
-                  <Link to={`/profile/${comment.user}`}>
-                    <h3 className="text-sm md:text-base font-semibold mt-1">
-                      {comment.user_name}
-                    </h3>
-                  </Link>
-                </div>
-                {userInfo?.id === comment.user && (
-                  <div className="flex space-x-2">
-                    <Button
-                      className="w-8 h-8"
-                      size="icon"
-                      variant="outline"
-                      onClick={() =>
-                        handleEditButton({
-                          id: comment.id,
-                          content: comment.content,
-                        })
-                      }
-                    >
-                      {isEdit ? (
-                        <X className="w-6 h-6" />
-                      ) : (
-                        <Pencil className="w-6 h-6" />
-                      )}
-                    </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
+        <>
+          {getAllComments.length > 0 ? (
+            <CardFooter className="w-full flex flex-col space-y-3">
+              <h1 className="text-lg font-semibold">Comments</h1>
+              {getAllComments.map((comment) => (
+                <div
+                  key={comment.id}
+                  className="flex flex-col space-y-3  bg-muted w-full rounded-lg p-4"
+                >
+                  <div className="flex justify-between">
+                    <div className="flex space-x-2">
+                      <Link to={`/profile/${comment.user}`}>
+                        <Avatar className="w-8 h-8">
+                          <AvatarImage src={comment.profile_image} />
+                          <AvatarFallback>P</AvatarFallback>
+                        </Avatar>
+                      </Link>
+                      <Link to={`/profile/${comment.user}`}>
+                        <h3 className="text-sm md:text-base font-semibold mt-1">
+                          {comment.user_name}
+                        </h3>
+                      </Link>
+                    </div>
+                    {userInfo?.id === comment.user && (
+                      <div className="flex space-x-2">
                         <Button
                           className="w-8 h-8"
                           size="icon"
-                          variant="destructive"
+                          variant="outline"
+                          onClick={() =>
+                            handleEditButton({
+                              id: comment.id,
+                              content: comment.content,
+                            })
+                          }
                         >
-                          <Trash className="w-6 h-6" />
+                          {isEdit ? (
+                            <X className="w-6 h-6" />
+                          ) : (
+                            <Pencil className="w-6 h-6" />
+                          )}
                         </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>
-                            Are you absolutely sure?
-                          </AlertDialogTitle>
-                          <AlertDialogDescription>
-                            This action cannot be undone. This will permanently
-                            delete your Post and remove your data from our
-                            servers.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                            onClick={() => handleCommentDelete(comment.id)}
-                            variant="destructive"
-                          >
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              className="w-8 h-8"
+                              size="icon"
+                              variant="destructive"
+                            >
+                              <Trash className="w-6 h-6" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Are you absolutely sure?
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action cannot be undone. This will
+                                permanently delete your Post and remove your
+                                data from our servers.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                onClick={() => handleCommentDelete(comment.id)}
+                                variant="destructive"
+                              >
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-              {isEdit && comment.id === editId ? (
-                <div className="flex flex-col space-y-2">
-                  <Textarea
-                    id="comment-edit"
-                    required
-                    value={editComment}
-                    onChange={(e) => setEditComment(e.target.value)}
-                    placeholder="Add a comment"
-                    className="w-full resize-none"
-                    rows={5}
-                  />
-                  <Button
-                    className="w-full"
-                    size="sm"
-                    onClick={() => handleCommentEdit(comment.id)}
-                  >
-                    Save
-                  </Button>
+                  {isEdit && comment.id === editId ? (
+                    <div className="flex flex-col space-y-2">
+                      <Textarea
+                        id="comment-edit"
+                        required
+                        value={editComment}
+                        onChange={(e) => setEditComment(e.target.value)}
+                        placeholder="Add a comment"
+                        className="w-full resize-none"
+                        rows={5}
+                      />
+                      <Button
+                        className="w-full"
+                        size="sm"
+                        onClick={() => handleCommentEdit(comment.id)}
+                      >
+                        Save
+                      </Button>
+                    </div>
+                  ) : (
+                    <p>{comment.content}</p>
+                  )}
                 </div>
-              ) : (
-                <p>{comment.content}</p>
-              )}
-            </div>
-          ))}
-        </CardFooter>
+              ))}
+            </CardFooter>
+          ) : (
+            <p className="text-center text-lg font-semibold mb-4">
+              No comments yet
+            </p>
+          )}
+        </>
       )}
     </>
   );

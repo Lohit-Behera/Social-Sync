@@ -97,7 +97,7 @@ function Navigation() {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <NavLink to="/chat">
+                      <NavLink to="/inbox">
                         {({ isActive }) => (
                           <Button
                             variant={`${isActive ? "default" : "ghost"}`}
@@ -112,7 +112,7 @@ function Navigation() {
                         )}
                       </NavLink>
                     </TooltipTrigger>
-                    <TooltipContent side="right">Chat</TooltipContent>
+                    <TooltipContent side="right">inbox</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
                 <TooltipProvider>
@@ -309,7 +309,7 @@ function Navigation() {
                       )}
                     </NavLink>
 
-                    <NavLink to="/chat">
+                    <NavLink to="/inbox">
                       {({ isActive }) => (
                         <Button
                           variant={`${isActive ? "default" : "ghost"}`}
@@ -319,7 +319,7 @@ function Navigation() {
                           }`}
                         >
                           <Send className="mr-2 h-4 w-4" />
-                          Chat
+                          inbox
                         </Button>
                       )}
                     </NavLink>

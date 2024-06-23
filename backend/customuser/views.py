@@ -11,14 +11,15 @@ from django.shortcuts import get_object_or_404
 from backend.settings import EMAIL_HOST_USER, MEDIA_ROOT, BASE_DIR
 
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.decorators import api_view, permission_classes, parser_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 import os
 
-from .serializers import UserSerializerWithToken, UserSerializer, ContactUsSerializer, UserFollowSerializer
+from .serializers import UserSerializerWithToken, UserSerializer, ContactUsSerializer, UserFollowSerializer, UserFollowingListSerializer
 
 from .models import CustomUser, EmailVerificationToken, ContactUs
 
@@ -37,12 +38,13 @@ class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
     
 @api_view(['POST'])
+@parser_classes([MultiPartParser, FormParser])
 def register_user(request):
     data = request.data
 
     try:
         if CustomUser.objects.filter(email=data['email']).exists():
-            return Response({'massage': 'User with this email already exists'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'User with this email already exists'}, status=status.HTTP_400_BAD_REQUEST)
         
         user_name = data['user_name']
         first_name_lower = data['first_name'].lower()
@@ -51,6 +53,7 @@ def register_user(request):
         last_name_lower = data['last_name'].lower()
         last_name = last_name_lower.replace(' ', '').capitalize()
 
+        profile_image = request.FILES.get('profile_image')
         email = data['email'].lower()
         user = CustomUser.objects.create(
             user_name=user_name,
@@ -58,6 +61,7 @@ def register_user(request):
             last_name=last_name,
             email=email,
             password=make_password(data['password']),
+            profile_image=profile_image,
         )
 
         send_verification_email(request, user)
@@ -67,7 +71,8 @@ def register_user(request):
 
     except Exception as e:
         print(e)
-        return Response({'massage': 'An error occurred while processing your request'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': 'An error occurred while processing your request'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 def send_verification_email(request, user):
     try:
@@ -344,3 +349,12 @@ def list_follow(request, user_id):
     user = CustomUser.objects.get(id=user_id)
     serializer = UserFollowSerializer(user, many=False)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def list_following(request):
+    user = request.user
+    following = user.following.all()
+    serializer = UserFollowingListSerializer(following, many=True)
+    return Response(serializer.data)

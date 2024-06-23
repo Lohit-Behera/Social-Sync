@@ -32,7 +32,7 @@ export const fetchRegister = createAsyncThunk('user/register', async (user, { re
     try {
         const config = {
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'multipart/form-data'
             },
         };
 
@@ -128,6 +128,29 @@ export const fetchUserDetailsUnknown = createAsyncThunk('user/unknown', async (i
     }
 });
 
+export const fetchFollowingList = createAsyncThunk('user/following', async (_, { rejectWithValue, getState }) => {
+    try {
+        const { user: { userInfo } = {} } = getState();
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userInfo.token}`,
+            },
+        };
+        const { data } = await axios.get(
+            `/api/user/list/following/`,
+            config
+        );
+        return data;
+    } catch (error) {
+        return rejectWithValue(
+            error.response && error.response.data.message
+                ? error.response.data.message
+                : error.message
+        );
+    }
+});
+
 
 const userSlice = createSlice({
     name: "user",
@@ -153,6 +176,10 @@ const userSlice = createSlice({
         userDetailsUnknown: null,
         userDetailsUnknownStatus: "idle",
         userDetailsUnknownError: null,
+
+        followingList: null,
+        followingListStatus: "idle",
+        followingListError: null,
     },
     reducers: {
         logout: (state) => {
@@ -170,6 +197,11 @@ const userSlice = createSlice({
             state.userUpdate = null;
             state.userUpdateStatus = "idle";
             state.userUpdateError = null;
+        },
+        resetFollowingList: (state) => {
+            state.followingList = null;
+            state.followingListStatus = "idle";
+            state.followingListError = null;
         }
     },
     extraReducers: (builder) => {
@@ -233,10 +265,22 @@ const userSlice = createSlice({
                 state.userDetailsUnknownStatus = "failed";
                 state.userDetailsUnknownError = action.payload;
             })
+
+            .addCase(fetchFollowingList.pending, (state) => {
+                state.followingListStatus = "loading";
+            })
+            .addCase(fetchFollowingList.fulfilled, (state, action) => {
+                state.followingListStatus = "succeeded";
+                state.followingList = action.payload;
+            })
+            .addCase(fetchFollowingList.rejected, (state, action) => {
+                state.followingListStatus = "failed";
+                state.followingListError = action.payload;
+            })
     },
 });
 
 
-export const { logout, resetRegister, resetUserUpdate } = userSlice.actions
+export const { logout, resetRegister, resetUserUpdate, resetFollowingList } = userSlice.actions
 
 export default userSlice.reducer

@@ -1,13 +1,11 @@
 import React from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchGetAllTextPost } from "@/features/TextPostSlice";
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -19,15 +17,13 @@ import {
   fetchGetFollow,
   resetFollow,
 } from "@/features/UserFollowSlice";
-import { fetchUserDetails } from "@/features/UserSlice";
-import { AlignJustify } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 function TextPostPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const userInfo = useSelector((state) => state.user.userInfo);
-  const userDetails = useSelector((state) => state.user.userDetails);
   const getAllTextPost = useSelector((state) => state.textPost.getAllTextPost);
   const getAllTextPostStatus = useSelector(
     (state) => state.textPost.getAllTextPostStatus
@@ -37,9 +33,8 @@ function TextPostPage() {
   const following = useSelector(
     (state) => state.userFollow.getFollow.following
   );
-  const getFollowStatus = useSelector(
-    (state) => state.userFollow.getFollowStatus
-  );
+
+  const [loadingUser, setLoadingUser] = useState(null);
 
   useEffect(() => {
     if (!userInfo) {
@@ -54,11 +49,17 @@ function TextPostPage() {
     if (followStatus === "succeeded") {
       dispatch(fetchGetFollow(userInfo.id));
       alert(follow.massage);
+      setLoadingUser(null);
+      dispatch(resetFollow());
+    } else if (followStatus === "failed") {
+      alert(follow.massage);
+      setLoadingUser(null);
       dispatch(resetFollow());
     }
   }, [followStatus, dispatch]);
 
   const handleLike = (id) => {
+    setLoadingUser(id);
     dispatch(fetchFollowUser(id));
   };
 
@@ -99,12 +100,22 @@ function TextPostPage() {
                             : "default"
                         }
                         onClick={() => handleLike(post.user)}
+                        disabled={
+                          loadingUser === post.user &&
+                          followStatus === "loading"
+                        }
                       >
-                        {following.includes(post.user)
-                          ? "Unfollow"
-                          : followStatus === "loading"
-                          ? "loading"
-                          : "Follow"}
+                        {following.includes(post.user) ? (
+                          "Unfollow"
+                        ) : loadingUser === post.user &&
+                          followStatus === "loading" ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
+                            loading
+                          </>
+                        ) : (
+                          "Follow"
+                        )}
                       </Button>
                     )}
                   </CardTitle>

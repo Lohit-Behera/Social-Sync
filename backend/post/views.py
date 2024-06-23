@@ -64,7 +64,7 @@ def like_unlike_post(request, pk):
 @permission_classes([IsAuthenticated])
 def get_all_text_posts(request):
     try:
-        posts = TextPost.objects.all()
+        posts = TextPost.objects.all().order_by('-created_at')
         serializer = TextPostSerializer(posts, many=True)
         return Response(serializer.data)
     except Exception as e:

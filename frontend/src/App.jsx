@@ -17,6 +17,8 @@ import UpdateProfilePage from "./Pages/UpdateProfilePage";
 import ProfilePage from "./Pages/ProfilePage";
 import TextPostPage from "./Pages/TextPostPage";
 import EditPost from "./Pages/EditPost";
+import InboxPage from "./Pages/InboxPage";
+import ChatPage from "./Pages/ChatPage";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -31,6 +33,8 @@ const router = createBrowserRouter(
       <Route path="/update-profile" element={<UpdateProfilePage />} />
       <Route path="/text-post" element={<TextPostPage />} />
       <Route path="/edit-post/:id/:type" element={<EditPost />} />
+      <Route path="/inbox" element={<InboxPage />} />
+      <Route path="/chat/:id" element={<ChatPage />} />
     </Route>
   )
 );

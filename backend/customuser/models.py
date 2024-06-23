@@ -1,15 +1,7 @@
 from django.db import models
-
-# Create your models here.
-from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 import uuid
 from PIL import Image
-
-# Create your models here.
-
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from django.db import models
 from post.models import TextPost
 
 class CustomUserManager(BaseUserManager):
@@ -85,3 +77,9 @@ class ContactUs(models.Model):
     
     def __str__(self):
         return self.email
+    
+class OnlineUser(models.Model):
+	user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+
+	def __str__(self):
+		return self.user.username

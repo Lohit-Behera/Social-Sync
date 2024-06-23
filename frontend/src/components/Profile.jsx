@@ -17,6 +17,7 @@ import {
   resetFollow,
 } from "@/features/UserFollowSlice";
 import { fetchGetUserAllTextPost } from "@/features/TextPostSlice";
+import { Loader2 } from "lucide-react";
 
 function Profile({ user = {} }) {
   const dispatch = useDispatch();
@@ -89,11 +90,15 @@ function Profile({ user = {} }) {
                   variant={userFollowing.includes(id) ? "secondary" : "default"}
                   onClick={() => handleLike(id)}
                 >
-                  {userFollowing.includes(id)
-                    ? "Unfollow"
-                    : followStatus === "loading"
-                    ? "loading"
-                    : "Follow"}
+                  {userFollowing.includes(id) ? (
+                    "Unfollow"
+                  ) : followStatus === "loading" ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> loading
+                    </>
+                  ) : (
+                    "Follow"
+                  )}
                 </Button>
               )}
             </CardTitle>

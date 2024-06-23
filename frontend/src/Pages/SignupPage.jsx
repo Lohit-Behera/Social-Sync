@@ -36,8 +36,18 @@ function SignupPage() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [profileImage, setProfileImage] = useState(null);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const imageHandler = (e) => {
+    const file = e.target.files[0];
+    if (file.type.startsWith("image/")) {
+      setProfileImage(file);
+    } else {
+      alert("Please select an image file");
+    }
+  };
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -46,17 +56,18 @@ function SignupPage() {
     } else if (!firstName || !lastName || !email || !password) {
       alert("Please enter all fields");
     } else {
-      dispatch(
-        fetchRegister({
-          user_name: userName,
-          first_name: firstName,
-          last_name: lastName,
-          email: email,
-          password: password,
-        })
-      );
+      const formData = new FormData();
+      formData.append("user_name", userName);
+      formData.append("first_name", firstName);
+      formData.append("last_name", lastName);
+      formData.append("email", email);
+      formData.append("profile_image", profileImage);
+      formData.append("password", password);
+
+      dispatch(fetchRegister(formData));
     }
   };
+
   return (
     <div className="w-full lg:grid lg:grid-cols-2 min-h-auto md:min-h-[100vh]">
       <div className="flex items-center justify-center py-12">
@@ -107,6 +118,18 @@ function SignupPage() {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
+            <div className="grid gap-2">
+              <Label htmlFor="profile-image">Profile Image</Label>
+              <input
+                type="file"
+                name="image"
+                id="image-upload"
+                accept="image/*"
+                label="Upload Image"
+                onChange={(e) => imageHandler(e)}
+                className="block w-full text-primary font-semibold file:me-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground file:hover:cursor-pointer hover:file:bg-primary/90  file:disabled:opacity-50 file:disabled:pointer-events-none cursor-pointer"
+              />
+            </div>
             <CustomPassword
               id="password"
               label="Password"
@@ -134,7 +157,7 @@ function SignupPage() {
           </div>
         </div>
       </div>
-      <div className="hidden bg-muted lg:block">
+      <div className="hidden bg-muted lg:block ">
         <a
           href="https://www.pexels.com/photo/waterfalls-surrounded-by-trees-2743287/"
           target="_blank"
@@ -142,9 +165,7 @@ function SignupPage() {
           <img
             src={WaterFall}
             alt="Image"
-            width="1920"
-            height="1080"
-            className="h-full w-full object-cover dark:brightness-[0.6] dark:grayscale"
+            className="h-full w-full object-cover grayscale hover:grayscale-0 duration-700 ease-in-out"
           />
         </a>
       </div>

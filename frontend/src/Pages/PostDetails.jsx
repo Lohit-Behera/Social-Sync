@@ -30,7 +30,7 @@ import {
 } from "@/features/TextPostSlice";
 import { Button } from "@/components/ui/button";
 import { Heart, MessageCircle, Send, Pencil, Trash } from "lucide-react";
-import { fetchLike } from "@/features/PostSlice";
+import { fetchLike, resetLike } from "@/features/PostSlice";
 import Comments from "@/components/Comments";
 
 function PostDetails() {

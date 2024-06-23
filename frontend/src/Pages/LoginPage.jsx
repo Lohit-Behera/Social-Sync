@@ -83,7 +83,7 @@ function LoginPage() {
           </div>
         </div>
       </div>
-      <div className="hidden bg-muted lg:block">
+      <div className="hidden bg-muted lg:block max-h-[110vh]">
         <a
           href="https://www.pexels.com/photo/waterfalls-surrounded-by-trees-2743287/"
           target="_blank"

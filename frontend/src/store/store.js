@@ -5,6 +5,8 @@ import UserSlice from "@/features/UserSlice";
 import TextPostSlice from "@/features/TextPostSlice";
 import PostSlice from "@/features/PostSlice";
 import UserFollowSlice from "@/features/UserFollowSlice";
+import ChatSlice from "@/features/ChatSlice";
+
 
 import DeleteImages from "@/features/DeleteImages";
 
@@ -15,6 +17,7 @@ const store = configureStore({
         textPost: TextPostSlice,
         post: PostSlice,
         userFollow: UserFollowSlice,
+        chat: ChatSlice,
         
         deleteImages: DeleteImages
     }
