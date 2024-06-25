@@ -32,7 +32,7 @@ function Layout() {
       ) : (
         <>
           <Navigation />
-          <div className="md:ml-[55px]">
+          <div className="md:ml-[55px] mt-14 md:mt-0">
             <Outlet />
           </div>
         </>

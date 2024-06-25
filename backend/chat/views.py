@@ -1,10 +1,25 @@
 from django.shortcuts import get_object_or_404
+
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
+from rest_framework import status
 from .models import ChatRoom, Message
 from .serializers import ChatRoomSerializer, MessageSerializer
 from customuser.models import CustomUser as User
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 15
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+    
+    def get_paginated_response(self, data):
+        return Response({
+            'total_pages': self.page.paginator.num_pages,
+            'current_page': self.page.number,
+            'results': data
+        })
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -24,8 +39,28 @@ def chat_room(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_messages(request, room_name):
+def get_initial_messages(request, room_name):
     room = get_object_or_404(ChatRoom, name=room_name)
-    messages = Message.objects.filter(room=room).order_by('timestamp')
+    messages = Message.objects.filter(room=room).order_by('-timestamp')[:15]
     serializer = MessageSerializer(messages, many=True)
-    return Response(serializer.data)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_all_messages(request, room_name):
+    try:
+        room = get_object_or_404(ChatRoom, name=room_name)
+        paginator = StandardResultsSetPagination()
+        messages = Message.objects.filter(room=room).order_by('-timestamp')
+        result_page = paginator.paginate_queryset(messages, request)
+        serializer = MessageSerializer(result_page, many=True)
+        response_data = {
+                'total_pages': paginator.page.paginator.num_pages,
+                'current_page': paginator.page.number,
+                'massages': serializer.data
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+    except Exception as e:
+        print(e)
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

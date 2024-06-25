@@ -25,7 +25,7 @@ export const fetchChatRoom = createAsyncThunk('chat/room', async (receiver, { re
     }
 });
 
-export const fetchMessage = createAsyncThunk('chat/message', async (roomName, { rejectWithValue, getState }) => {
+export const fetchInitialMessage = createAsyncThunk('initial/message', async (roomName, { rejectWithValue, getState }) => {
     try {
         const { user: { userInfo } = {} } = getState();
         const config = {
@@ -35,7 +35,30 @@ export const fetchMessage = createAsyncThunk('chat/message', async (roomName, { 
             },
         };
         const { data } = await axios.get(
-            `/api/chat/messages/${roomName}/`,
+            `/api/chat/initial/messages/${roomName}/`,
+            config
+        );
+        return data;
+    } catch (error) {
+        return rejectWithValue(
+            error.response && error.response.data.message
+                ? error.response.data.message
+                : error.message
+        );
+    }
+});
+
+export const fetchAllMassage = createAsyncThunk('all/message', async (names, { rejectWithValue, getState }) => {
+    try {
+        const { user: { userInfo } = {} } = getState();
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userInfo.token}`,
+            },
+        };
+        const { data } = await axios.get(
+            `/api/chat/all/messages/${names.roomName}/${names.keyword}`,
             config
         );
         return data;
@@ -55,11 +78,26 @@ const chatSlice = createSlice({
         chatRoomStatus: "idle",
         chatRoomError: null,
 
-        message: null,
-        messageStatus: "idle",
-        messageError: null,
+        initialMessage: null,
+        initialMessageStatus: "idle",
+        initialMessageError: null,
+
+        allMessage: null,
+        allMessageStatus: "idle",
+        allMessageError: null,
     },
-    reducers: {},
+    reducers: {
+        resetInitialMessage: (state) => {
+            state.initialMessage = null;
+            state.initialMessageStatus = "idle";
+            state.initialMessageError = null;
+        },
+        resetAllMessage: (state) => {
+            state.allMessage = null;
+            state.allMessageStatus = "idle";
+            state.allMessageError = null;
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(fetchChatRoom.pending, (state) => {
@@ -74,18 +112,32 @@ const chatSlice = createSlice({
                 state.chatRoomError = action.payload;
             })
 
-            .addCase(fetchMessage.pending, (state) => {
-                state.messageStatus = "loading";
+            .addCase(fetchInitialMessage.pending, (state) => {
+                state.initialMessageStatus = "loading";
             })
-            .addCase(fetchMessage.fulfilled, (state, action) => {
-                state.messageStatus = "succeeded";
-                state.message = action.payload;
+            .addCase(fetchInitialMessage.fulfilled, (state, action) => {
+                state.initialMessageStatus = "succeeded";
+                state.initialMessage = action.payload;
             })
-            .addCase(fetchMessage.rejected, (state, action) => {
-                state.messageStatus = "failed";
-                state.messageError = action.payload;
+            .addCase(fetchInitialMessage.rejected, (state, action) => {
+                state.initialMessageStatus = "failed";
+                state.initialMessageError = action.payload;
+            })
+
+            .addCase(fetchAllMassage.pending, (state) => {
+                state.allMessageStatus = "loading";
+            })
+            .addCase(fetchAllMassage.fulfilled, (state, action) => {
+                state.allMessageStatus = "succeeded";
+                state.allMessage = action.payload;
+            })
+            .addCase(fetchAllMassage.rejected, (state, action) => {
+                state.allMessageStatus = "failed";
+                state.allMessageError = action.payload;
             })
     },
 });
+
+export const { resetInitialMessage, resetAllMessage } = chatSlice.actions;
 
 export default chatSlice.reducer;

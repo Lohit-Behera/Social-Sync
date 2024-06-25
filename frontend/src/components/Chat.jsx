@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchMessage } from "@/features/ChatSlice";
+import {
+  fetchAllMassage,
+  fetchInitialMessage,
+  resetInitialMessage,
+  resetAllMessage,
+} from "@/features/ChatSlice";
 import moment from "moment";
 import { Input } from "./ui/input";
-import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 
 const Chat = ({ roomName }) => {
@@ -11,21 +15,92 @@ const Chat = ({ roomName }) => {
 
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const [isAtTop, setIsAtTop] = useState(false);
+  const [totalPages, setTotalPages] = useState(2);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [scroll, setScroll] = useState(false);
+
+  const bottom = useRef(null);
+
+  const scrollToBottom = () => {
+    if (bottom.current) {
+      bottom.current.scrollIntoView({ block: "end" });
+    }
+  };
 
   const websocket = useRef(null);
   const userInfo = useSelector((state) => state.user.userInfo);
-  const chatMassages = useSelector((state) => state.chat.message) || [];
-  const messageStatus = useSelector((state) => state.chat.messageStatus);
+  const initialMessage =
+    useSelector((state) => state.chat.initialMessage) || [];
+  const initialMessageStatus = useSelector(
+    (state) => state.chat.initialMessageStatus
+  );
+  const allMessagesData = useSelector((state) => state.chat.allMessage) || {};
+  const allMessageStatus = useSelector((state) => state.chat.allMessageStatus);
 
   useEffect(() => {
-    if (messageStatus === "succeeded") {
-      setMessages(chatMassages);
-    } else if (messageStatus === "failed") {
+    setMessages([]);
+    dispatch(resetInitialMessage());
+    dispatch(resetAllMessage());
+  }, []);
+
+  useEffect(() => {
+    if (initialMessageStatus === "succeeded") {
+      const chatMassages = [...initialMessage].reverse();
+      setMessages([...chatMassages].concat(messages));
+      setScroll(true);
+    } else if (initialMessageStatus === "failed") {
       setMessages([]);
-    } else if (messageStatus === "idle") {
-      dispatch(fetchMessage(roomName));
+    } else if (initialMessageStatus === "idle") {
+      dispatch(fetchInitialMessage(roomName));
     }
-  }, [roomName, dispatch, messageStatus]);
+  }, [roomName, dispatch, initialMessageStatus]);
+
+  useEffect(() => {
+    if (allMessageStatus === "succeeded") {
+      setTotalPages(allMessagesData.total_pages);
+      setCurrentPage(allMessagesData.current_page);
+      const chatMassages = [...allMessagesData.massages].reverse();
+      setMessages([...chatMassages].concat(messages));
+    } else if (allMessageStatus === "failed") {
+      setTotalPages(2);
+      setCurrentPage(1);
+    }
+  }, [roomName, dispatch, allMessageStatus]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [scroll]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY === 0) {
+        setIsAtTop(true);
+      } else {
+        setIsAtTop(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isAtTop) {
+      console.log("Scrolled to top!");
+      if (currentPage < totalPages) {
+        dispatch(
+          fetchAllMassage({
+            roomName: roomName,
+            keyword: `?page=${currentPage + 1}`,
+          })
+        );
+      }
+    }
+  }, [isAtTop]);
 
   useEffect(() => {
     websocket.current = new WebSocket(
@@ -39,6 +114,7 @@ const Chat = ({ roomName }) => {
     websocket.current.onmessage = (e) => {
       const data = JSON.parse(e.data);
       setMessages((prev) => [...prev, data]);
+      scrollToBottom();
     };
 
     websocket.current.onerror = (e) => {
@@ -69,42 +145,39 @@ const Chat = ({ roomName }) => {
 
   return (
     <>
-      {messageStatus === "loading" || messageStatus === "idle" ? (
+      {initialMessageStatus === "loading" || initialMessageStatus === "idle" ? (
         <p>Loading...</p>
-      ) : messageStatus === "failed" ? (
+      ) : initialMessageStatus === "failed" ? (
         <p>Something went wrong</p>
       ) : (
         <>
-          <div className="space-y-4 min-h-[80vh]">
+          {allMessageStatus === "loading" && <p>Loading...</p>}
+          <div className="space-y-4 min-h-[80vh] mb-4">
             {messages.map((msg, index) => (
               <div
                 key={index}
-                className={`flex ${
+                className={`flex flex-col ${
                   msg.sender === userInfo.id ? "justify-end" : "justify-start"
                 } `}
               >
-                <div className="flex flex-col justify-start">
-                  <p
-                    className={`flex ${
-                      msg.sender === userInfo.id
-                        ? "justify-end"
-                        : "justify-start"
-                    } bg-card p-2 rounded-l`}
-                  >
-                    {msg.message}
-                  </p>
-                  <em
-                    className={`text-xs text-muted-foreground ${
-                      msg.sender === userInfo.id ? "text-right" : ""
-                    }`}
-                  >
-                    {moment(msg.timestamp).fromNow()}
-                  </em>
+                <div
+                  className={`flex gap-2 ${
+                    msg.sender === userInfo.id ? "justify-end" : "justify-start"
+                  }`}
+                >
+                  <p className={`flex bg-card p-2 rounded-lg`}>{msg.message}</p>
                 </div>
+                <em
+                  className={`text-xs text-muted-foreground ${
+                    msg.sender === userInfo.id ? "text-right" : ""
+                  }`}
+                >
+                  {moment(msg.timestamp).fromNow()}
+                </em>
               </div>
             ))}
           </div>
-          <div className="grid gap-4 w-full bottom-0">
+          <div className="grid gap-4 w-full bottom-0" ref={bottom}>
             <Input
               type="text"
               value={newMessage}

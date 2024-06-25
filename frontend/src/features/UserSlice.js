@@ -151,6 +151,29 @@ export const fetchFollowingList = createAsyncThunk('user/following', async (_, {
     }
 });
 
+export const fetchOtherProfile = createAsyncThunk('user/other', async (id, { rejectWithValue, getState }) => {
+    try {
+        const { user: { userInfo } = {} } = getState();
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userInfo.token}`,
+            },
+        };
+        const { data } = await axios.get(
+            `/api/user/others/profile/${id}/`,
+            config
+        );
+        return data;
+    } catch (error) {
+        return rejectWithValue(
+            error.response && error.response.data.message
+                ? error.response.data.message
+                : error.message
+        );
+    }
+})
+
 
 const userSlice = createSlice({
     name: "user",
@@ -180,6 +203,10 @@ const userSlice = createSlice({
         followingList: null,
         followingListStatus: "idle",
         followingListError: null,
+
+        otherProfile: null,
+        otherProfileStatus: "idle",
+        otherProfileError: null,
     },
     reducers: {
         logout: (state) => {
@@ -276,6 +303,18 @@ const userSlice = createSlice({
             .addCase(fetchFollowingList.rejected, (state, action) => {
                 state.followingListStatus = "failed";
                 state.followingListError = action.payload;
+            })
+
+            .addCase(fetchOtherProfile.pending, (state) => {
+                state.otherProfileStatus = "loading";
+            })
+            .addCase(fetchOtherProfile.fulfilled, (state, action) => {
+                state.otherProfileStatus = "succeeded";
+                state.otherProfile = action.payload;
+            })
+            .addCase(fetchOtherProfile.rejected, (state, action) => {
+                state.otherProfileStatus = "failed";
+                state.otherProfileError = action.payload;
             })
     },
 });

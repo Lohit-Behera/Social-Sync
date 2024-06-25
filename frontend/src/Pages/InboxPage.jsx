@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { fetchFollowingList } from "@/features/UserSlice";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -23,7 +23,6 @@ import {
 function InboxPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const userDetails = useSelector((state) => state.user.userDetails);
   const followingList = useSelector((state) => state.user.followingList);
   const followingListStatus = useSelector(
     (state) => state.user.followingListStatus
@@ -92,12 +91,13 @@ function InboxPage() {
                   </div>
                   <Button
                     className="my-auto"
-                    variant="outline"
+                    variant="ghost"
+                    size="icon"
                     onClick={() => {
                       navigate(`/chat/${user.id}`);
                     }}
                   >
-                    Message
+                    <Send className="w-5 h-5 md:w-auto md:h-auto" />
                   </Button>
                 </div>
               ))}

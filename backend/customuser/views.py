@@ -358,3 +358,11 @@ def list_following(request):
     following = user.following.all()
     serializer = UserFollowingListSerializer(following, many=True)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def other_user_profile(request, user_id):
+    user = CustomUser.objects.get(id=user_id)
+    serializer = UserFollowingListSerializer(user, many=False)
+    return Response(serializer.data)

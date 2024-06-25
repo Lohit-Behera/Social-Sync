@@ -276,7 +276,7 @@ function Navigation() {
           </nav>
         </aside>
       </div>
-      <header className="block md:hidden">
+      <header className="fixed inset-x-0 top-0 z-50 backdrop-blur bg-background/50 block md:hidden">
         <nav className="flex justify-between p-2">
           <Sheet>
             <SheetTrigger asChild>
