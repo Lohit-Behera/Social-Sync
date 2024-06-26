@@ -5,35 +5,56 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
-from .models import TextPost, Like, Comment
-from .serializers import TextPostSerializer, CommentSerializer
+from .models import Post, Like, Comment
+from .serializers import PostSerializer, CommentSerializer
+
+from PIL import Image
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def create_text_post(request):
+def create_post(request):
     try:
         data = request.data
         user = request.user
+        if data['type'] == 'text':
+            post = Post.objects.create(
+                user=user,
+                content=data['content'],
+                type=data['type']
+            )
+            
+        if data['type'] == 'image':
+            post = Post.objects.create(
+                user=user,
+                image=data['image'],
+                content=data['content'],
+                type=data['type']
+            )
+            
+        if data['type'] == 'video':
+            post = Post.objects.create(
+                user=user,
+                video=data['video'],
+                content=data['content'],
+                type=data['type']
+            )
 
-        text_post = TextPost.objects.create(
-            user=user,
-            content=data['content']
-        )
-
-        serializer = TextPostSerializer(text_post, many=False)
+        serializer = PostSerializer(post, many=False)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     except Exception as e:
         print(e)
         return Response({'message': 'An error occurred while processing your request'}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-def get_text_post(request,pk):
+def get_post(request,pk):
     try:
-        text_post = TextPost.objects.get(id=pk)
-        likes_count = Like.objects.filter(post=text_post.id).count()
-        text_post.total_likes = likes_count
-        text_post.save()
-        serializer = TextPostSerializer(text_post, many=False)
+        post = Post.objects.get(id=pk)
+        likes_count = Like.objects.filter(post=post.id).count()
+        comment_count = Comment.objects.filter(post=post.id).count()
+        post.total_likes = likes_count
+        post.total_comments = comment_count
+        post.save()
+        serializer = PostSerializer(post, many=False)
         return Response(serializer.data)
     except Exception as e:
         print(e)
@@ -44,7 +65,7 @@ def get_text_post(request,pk):
 def like_unlike_post(request, pk):
     try:
         user = request.user
-        post = get_object_or_404(TextPost, id=pk)
+        post = get_object_or_404(Post, id=pk)
 
         like_obj, created = Like.objects.get_or_create(user=user, post=post)
 
@@ -64,8 +85,8 @@ def like_unlike_post(request, pk):
 @permission_classes([IsAuthenticated])
 def get_all_text_posts(request):
     try:
-        posts = TextPost.objects.all().order_by('-created_at')
-        serializer = TextPostSerializer(posts, many=True)
+        posts = Post.objects.filter(type='text').order_by('-created_at')
+        serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
     except Exception as e:
         print(e)
@@ -75,8 +96,8 @@ def get_all_text_posts(request):
 @permission_classes([IsAuthenticated])
 def get_user_posts(request, pk):
     try:
-        post = TextPost.objects.filter(user=pk)
-        serializer = TextPostSerializer(post, many=True)
+        post = Post.objects.filter(user=pk)
+        serializer = PostSerializer(post, many=True)
         return Response(serializer.data)
     except Exception as e:
         print(e)
@@ -86,7 +107,7 @@ def get_user_posts(request, pk):
 @permission_classes([IsAuthenticated])
 def edit_text_post(request, pk):
     try:
-        post = TextPost.objects.get(id=pk)
+        post = Post.objects.get(id=pk)
         data = request.data
         post.content = data['content']
         post.updated_at = timezone.now()
@@ -99,21 +120,28 @@ def edit_text_post(request, pk):
     
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
-def delete_text_post(request, pk):
+def delete_post(request, pk):
     try:
-        post = TextPost.objects.get(id=pk)
+        post = Post.objects.get(id=pk)
+        
+        if post.type == 'image':
+            post.image.delete()
+        if post.type == 'video':
+            post.video.delete()
+        
         post.delete()
         return Response({'message': 'Post deleted successfully'}, status=status.HTTP_200_OK)
     except Exception as e:
         print(e)
         return Response({'message': 'An error occurred while processing your request'}, status=status.HTTP_400_BAD_REQUEST)
+
     
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def create_comment(request, pk):
     try:
         user = request.user
-        post = TextPost.objects.get(id=pk)
+        post = Post.objects.get(id=pk)
         data = request.data
         
         comment = Comment.objects.create(
@@ -159,3 +187,11 @@ def edit_comment(request, pk):
     except Exception as e:
         print(e)
         return Response({'message': 'An error occurred while processing your request'}, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_all_video_posts(request):
+    video_posts = Post.objects.filter(type='video').order_by('-created_at')
+    serializer = PostSerializer(video_posts, many=True)
+    return Response(serializer.data)
+    

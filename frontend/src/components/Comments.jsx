@@ -26,7 +26,7 @@ import {
   resetCreateComment,
   resetDeleteComment,
   resetEditComment,
-} from "@/features/PostSlice";
+} from "@/features/PostRelatedSlice";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 
@@ -35,17 +35,19 @@ function Comments({ id }) {
 
   const userInfo = useSelector((state) => state.user.userInfo);
   const createCommentStatus = useSelector(
-    (state) => state.post.createCommentStatus
+    (state) => state.postRelated.createCommentStatus
   );
-  const getAllComments = useSelector((state) => state.post.getAllComments);
+  const getAllComments = useSelector(
+    (state) => state.postRelated.getAllComments
+  );
   const getAllCommentsStatus = useSelector(
-    (state) => state.post.getAllCommentsStatus
+    (state) => state.postRelated.getAllCommentsStatus
   );
   const editCommentStatus = useSelector(
-    (state) => state.post.editCommentStatus
+    (state) => state.postRelated.editCommentStatus
   );
   const deleteCommentStatus = useSelector(
-    (state) => state.post.deleteCommentStatus
+    (state) => state.postRelated.deleteCommentStatus
   );
 
   useEffect(() => {

@@ -71,6 +71,29 @@ export const fetchAllMassage = createAsyncThunk('all/message', async (names, { r
     }
 });
 
+export const fetchUserList = createAsyncThunk('user/list', async (_, { rejectWithValue, getState }) => {
+    try {
+        const { user: { userInfo } = {} } = getState();
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userInfo.token}`,
+            },
+        };
+        const { data } = await axios.get(
+            `/api/chat/user/list//`,
+            config
+        );
+        return data;
+    } catch (error) {
+        return rejectWithValue(
+            error.response && error.response.data.message
+                ? error.response.data.message
+                : error.message
+        );
+    }
+})
+
 const chatSlice = createSlice({
     name: 'chat',
     initialState: {
@@ -85,6 +108,10 @@ const chatSlice = createSlice({
         allMessage: null,
         allMessageStatus: "idle",
         allMessageError: null,
+
+        userList: null,
+        userListStatus: "idle",
+        userListError: null
     },
     reducers: {
         resetInitialMessage: (state) => {
@@ -134,6 +161,18 @@ const chatSlice = createSlice({
             .addCase(fetchAllMassage.rejected, (state, action) => {
                 state.allMessageStatus = "failed";
                 state.allMessageError = action.payload;
+            })
+
+            .addCase(fetchUserList.pending, (state) => {
+                state.userListStatus = "loading";
+            })
+            .addCase(fetchUserList.fulfilled, (state, action) => {
+                state.userListStatus = "succeeded";
+                state.userList = action.payload;
+            })
+            .addCase(fetchUserList.rejected, (state, action) => {
+                state.userListStatus = "failed";
+                state.userListError = action.payload;
             })
     },
 });

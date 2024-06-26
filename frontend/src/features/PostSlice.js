@@ -1,21 +1,21 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-// Like post
-export const fetchLike = createAsyncThunk('like', async (id, { rejectWithValue, getState }) => {
+export const fetchCreatePost = createAsyncThunk('create/post', async (post, { rejectWithValue, getState }) => {
     try {
         const { user: { userInfo } = {} } = getState();
         const config = {
             headers: {
-                'Content-Type': 'application/json',
+                'Content-Type': 'multipart/form-data',
                 'Authorization': `Bearer ${userInfo.token}`,
             },
         };
         const { data } = await axios.post(
-            `/api/post/like/${id}/`,
-            {},
+            '/api/post/create/',
+            post,
             config
         );
+
         return data;
     } catch (error) {
         return rejectWithValue(
@@ -24,35 +24,10 @@ export const fetchLike = createAsyncThunk('like', async (id, { rejectWithValue, 
                 : error.message
         );
     }
-})
+});
 
-// Create Comment
-export const fetchCreateComment = createAsyncThunk('comment/create', async (comment, { rejectWithValue, getState }) => {
-    try {
-        const { user: { userInfo } = {} } = getState();
-        const config = {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${userInfo.token}`,
-            },
-        };
-        const { data } = await axios.put(
-            `/api/post/create/comment/${comment.id}/`,
-            comment,
-            config
-        );
-        return data;
-    } catch (error) {
-        return rejectWithValue(
-            error.response && error.response.data.message
-                ? error.response.data.message
-                : error.message
-        );
-    }
-})
 
-// get all comments
-export const fetchGetAllComments = createAsyncThunk('get/all/comments', async (id, { rejectWithValue }) => {
+export const fetchGetPost = createAsyncThunk('get/post', async (id, { rejectWithValue }) => {
     try {
         const config = {
             headers: {
@@ -60,7 +35,55 @@ export const fetchGetAllComments = createAsyncThunk('get/all/comments', async (i
             },
         };
         const { data } = await axios.get(
-            `/api/post/get/comments/${id}/`,
+            `/api/post/get/post/${id}/`,
+            config
+        );
+
+        return data;
+    } catch (error) {
+        return rejectWithValue(
+            error.response && error.response.data.message
+                ? error.response.data.message
+                : error.message
+        );
+    }
+});
+
+export const fetchGetAllTextPost = createAsyncThunk('get/all/textPost', async (_, { rejectWithValue, getState }) => {
+    try {
+        const { user: { userInfo } = {} } = getState();
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userInfo.token}`,
+            },
+        };
+        const { data } = await axios.get(
+            '/api/post/get/all/text/',
+            config
+        );
+
+        return data;
+    } catch (error) {
+        return rejectWithValue(
+            error.response && error.response.data.message
+                ? error.response.data.message
+                : error.message
+        );
+    }
+});
+
+export const fetchGetUserAllTextPost = createAsyncThunk('get/user/all/textPost', async (id, { rejectWithValue, getState }) => {
+    try {
+        const { user: { userInfo } = {} } = getState();
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userInfo.token}`,
+            },
+        };
+        const { data } = await axios.get(
+            `/api/post/get/user/${id}/`,
             config
         );
         return data;
@@ -73,8 +96,7 @@ export const fetchGetAllComments = createAsyncThunk('get/all/comments', async (i
     }
 })
 
-//delete comment
-export const fetchDeleteComment = createAsyncThunk('delete/comment', async (id, { rejectWithValue, getState }) => {
+export const fetchDeletePost = createAsyncThunk('delete/post', async (id, { rejectWithValue, getState }) => {
     try {
         const { user: { userInfo } = {} } = getState();
         const config = {
@@ -84,7 +106,7 @@ export const fetchDeleteComment = createAsyncThunk('delete/comment', async (id, 
             },
         };
         const { data } = await axios.delete(
-            `/api/post/delete/comment/${id}/`,
+            `/api/post/delete/${id}/`,
             config
         );
         return data;
@@ -97,8 +119,7 @@ export const fetchDeleteComment = createAsyncThunk('delete/comment', async (id, 
     }
 })
 
-// edit comment
-export const fetchEditComment = createAsyncThunk('edit/comment', async (comment, { rejectWithValue, getState }) => {
+export const fetchEditTextPost = createAsyncThunk('edit/textPost', async (textPost, { rejectWithValue, getState }) => {
     try {
         const { user: { userInfo } = {} } = getState();
         const config = {
@@ -108,8 +129,31 @@ export const fetchEditComment = createAsyncThunk('edit/comment', async (comment,
             },
         };
         const { data } = await axios.put(
-            `/api/post/edit/comment/${comment.id}/`,
-            comment,
+            `/api/post/edit/text/${textPost.id}/`,
+            textPost,
+            config
+        );
+        return data;
+    } catch (error) {
+        return rejectWithValue(
+            error.response && error.response.data.message
+                ? error.response.data.message
+                : error.message
+        );
+    }
+})
+
+export const fetchGetAllVideoPost = createAsyncThunk('get/all/videoPost', async (_, { rejectWithValue, getState }) => {
+    try {
+        const { user: { userInfo } = {} } = getState();
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userInfo.token}`,
+            },
+        };
+        const { data } = await axios.get(
+            '/api/post/get/all/video/',
             config
         );
         return data;
@@ -123,118 +167,148 @@ export const fetchEditComment = createAsyncThunk('edit/comment', async (comment,
 })
 
 const PostSlice = createSlice({
-    name: 'post',
+    name: "post",
     initialState: {
-        postLike: {},
-        postLikeStatus: 'idle',
-        postLikeError: null,
+        createPost: {},
+        createPostStatus: 'idle',
+        createPostError: null,
 
-        createComment: null,
-        createCommentStatus: 'idle',
-        createCommentError: null,
+        getPost: {},
+        getPostStatus: 'idle',
+        getPostError: null,
 
-        getAllComments: [],
-        getAllCommentsStatus: 'idle',
-        getAllCommentsError: null,
+        getAllTextPost: {},
+        getAllTextPostStatus: 'idle',
+        getAllTextPostError: null,
 
-        deleteComment: null,
-        deleteCommentStatus: 'idle',
-        deleteCommentError: null,
+        getAllVideoPost: {},
+        getAllVideoPostStatus: 'idle',
+        getAllVideoPostError: null,
 
-        editComment: null,
-        editCommentStatus: 'idle',
-        editCommentError: null,
+        getUserAllTextPost: {},
+        getUserAllTextPostStatus: 'idle',
+        getUserAllTextPostError: null,
+
+        deletePost: null,
+        deletePostStatus: 'idle',
+        deletePostError: null,
+
+        editTextPost: null,
+        editTextPostStatus: 'idle',
+        editTextPostError: null,
     },
-    reducers:{
-        resetLike: (state) => {
-            state.postLike = {};
-            state.postLikeStatus = 'idle';
-            state.postLikeError = null;
+    reducers: {
+        resetCreatePost: (state) => {
+            state.createPost = {};
+            state.createPostStatus = 'idle';
+            state.createPostError = null;
         },
-        resetCreateComment: (state) => {
-            state.createComment = null;
-            state.createCommentStatus = 'idle';
-            state.createCommentError = null;
+        resetDeleteTextPost: (state) => {
+            state.deletePost = null;
+            state.deletePostStatus = 'idle';
+            state.deletePostError = null;
         },
-        resetDeleteComment: (state) => {
-            state.deleteComment = null;
-            state.deleteCommentStatus = 'idle';
-            state.deleteCommentError = null;
-        },
-        resetEditComment: (state) => {
-            state.editComment = null;
-            state.editCommentStatus = 'idle';
-            state.editCommentError = null;
+        resetEditTextPost: (state) => {
+            state.editTextPost = null;
+            state.editTextPostStatus = 'idle';
+            state.editTextPostError = null;
         }
     },
     extraReducers: (builder) => {
         builder
-        // Like Post
-            .addCase(fetchLike.pending, (state) => {
-                state.postLikeStatus = 'loading';
+        // Create Text Post
+            .addCase(fetchCreatePost.pending, (state) => {
+                state.createPostStatus = 'loading';
             })
-            .addCase(fetchLike.fulfilled, (state, action) => {
-                state.postLikeStatus = 'succeeded';
-                state.postLike = action.payload;
+            .addCase(fetchCreatePost.fulfilled, (state, action) => {
+                state.createPostStatus = 'succeeded';
+                state.createPost = action.payload;
             })
-            .addCase(fetchLike.rejected, (state, action) => {
-                state.postLikeStatus = 'failed';
-                state.postLikeError = action.payload;
-            })
-
-        // Create Comment
-            .addCase(fetchCreateComment.pending, (state) => {
-                state.createCommentStatus = 'loading';
-            })
-            .addCase(fetchCreateComment.fulfilled, (state, action) => {
-                state.createCommentStatus = 'succeeded';
-                state.createComment = action.payload;
-            })
-            .addCase(fetchCreateComment.rejected, (state, action) => {
-                state.createCommentStatus = 'failed';
-                state.createCommentError = action.payload;
+            .addCase(fetchCreatePost.rejected, (state, action) => {
+                state.createPostStatus = 'failed';
+                state.createPostError = action.payload;
             })
 
-        // Get All Comments
-            .addCase(fetchGetAllComments.pending, (state) => {
-                state.getAllCommentsStatus = 'loading';
+        // Get Text Post
+
+            .addCase(fetchGetPost.pending, (state) => {
+                state.getPostStatus = 'loading';
             })
-            .addCase(fetchGetAllComments.fulfilled, (state, action) => {
-                state.getAllCommentsStatus = 'succeeded';
-                state.getAllComments = action.payload;
+            .addCase(fetchGetPost.fulfilled, (state, action) => {
+                state.getPostStatus = 'succeeded';
+                state.getPost = action.payload;
             })
-            .addCase(fetchGetAllComments.rejected, (state, action) => {
-                state.getAllCommentsStatus = 'failed';
-                state.getAllCommentsError = action.payload;
+            .addCase(fetchGetPost.rejected, (state, action) => {
+                state.getPostStatus = 'failed';
+                state.getPostError = action.payload;
             })
 
-        // Delete Comment
-            .addCase(fetchDeleteComment.pending, (state) => {
-                state.deleteCommentStatus = 'loading';
+            // Get All Text Post
+            .addCase(fetchGetAllTextPost.pending, (state) => {
+                state.getAllTextPostStatus = 'loading';
             })
-            .addCase(fetchDeleteComment.fulfilled, (state, action) => {
-                state.deleteCommentStatus = 'succeeded';
-                state.deleteComment = action.payload;
+            .addCase(fetchGetAllTextPost.fulfilled, (state, action) => {
+                state.getAllTextPostStatus = 'succeeded';
+                state.getAllTextPost = action.payload;
             })
-            .addCase(fetchDeleteComment.rejected, (state, action) => {
-                state.deleteCommentStatus = 'failed';
-                state.deleteCommentError = action.payload;
+            .addCase(fetchGetAllTextPost.rejected, (state, action) => {
+                state.getAllTextPostStatus = 'failed';
+                state.getAllTextPostError = action.payload;
             })
 
-        // Edit Comment
-            .addCase(fetchEditComment.pending, (state) => {
-                state.editCommentStatus = 'loading';
+            // Get All Video Post
+            .addCase(fetchGetAllVideoPost.pending, (state) => {
+                state.getAllVideoPostStatus = 'loading';
             })
-            .addCase(fetchEditComment.fulfilled, (state, action) => {
-                state.editCommentStatus = 'succeeded';
-                state.editComment = action.payload;
+            .addCase(fetchGetAllVideoPost.fulfilled, (state, action) => {
+                state.getAllVideoPostStatus = 'succeeded';
+                state.getAllVideoPost = action.payload;
             })
-            .addCase(fetchEditComment.rejected, (state, action) => {
-                state.editCommentStatus = 'failed';
-                state.editCommentError = action.payload;
+            .addCase(fetchGetAllVideoPost.rejected, (state, action) => {
+                state.getAllVideoPostStatus = 'failed';
+                state.getAllVideoPostError = action.payload;
             })
-    }
-})
 
-export const { resetLike, resetCreateComment, resetDeleteComment, resetEditComment } = PostSlice.actions
-export default PostSlice.reducer
+            // Get User All Text Post
+            .addCase(fetchGetUserAllTextPost.pending, (state) => {
+                state.getUserAllTextPostStatus = 'loading';
+            })
+            .addCase(fetchGetUserAllTextPost.fulfilled, (state, action) => {
+                state.getUserAllTextPostStatus = 'succeeded';
+                state.getUserAllTextPost = action.payload;
+            })
+            .addCase(fetchGetUserAllTextPost.rejected, (state, action) => {
+                state.getUserAllTextPostStatus = 'failed';
+                state.getUserAllTextPostError = action.payload;
+            })
+
+            // Delete Text Post
+            .addCase(fetchDeletePost.pending, (state) => {
+                state.deletePostStatus = 'loading';
+            })
+            .addCase(fetchDeletePost.fulfilled, (state, action) => {
+                state.deletePostStatus = 'succeeded';
+                state.deletePost = action.payload;
+            })
+            .addCase(fetchDeletePost.rejected, (state, action) => {
+                state.deletePostStatus = 'failed';
+                state.deletePostError = action.payload;
+            })
+
+            // Edit Text Post
+            .addCase(fetchEditTextPost.pending, (state) => {
+                state.editTextPostStatus = 'loading';
+            })
+            .addCase(fetchEditTextPost.fulfilled, (state, action) => {
+                state.editTextPostStatus = 'succeeded';
+                state.editTextPost = action.payload;
+            })
+            .addCase(fetchEditTextPost.rejected, (state, action) => {
+                state.editTextPostStatus = 'failed';
+                state.editTextPostError = action.payload;
+            })
+    },
+});
+
+export const { resetCreatePost, resetDeletePost, resetEditTextPost } = PostSlice.actions;
+export default PostSlice.reducer;

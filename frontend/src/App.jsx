@@ -19,6 +19,7 @@ import TextPostPage from "./Pages/TextPostPage";
 import EditPost from "./Pages/EditPost";
 import InboxPage from "./Pages/InboxPage";
 import ChatPage from "./Pages/ChatPage";
+import VideoPostPage from "./Pages/VideoPostPage";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -35,6 +36,7 @@ const router = createBrowserRouter(
       <Route path="/edit-post/:id/:type" element={<EditPost />} />
       <Route path="/inbox" element={<InboxPage />} />
       <Route path="/chat/:id" element={<ChatPage />} />
+      <Route path="/video-post" element={<VideoPostPage />} />
     </Route>
   )
 );

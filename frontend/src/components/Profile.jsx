@@ -16,7 +16,7 @@ import {
   fetchGetFollow,
   resetFollow,
 } from "@/features/UserFollowSlice";
-import { fetchGetUserAllTextPost } from "@/features/TextPostSlice";
+import { fetchGetUserAllTextPost } from "@/features/PostSlice";
 import { Loader2 } from "lucide-react";
 
 function Profile({ user = {} }) {

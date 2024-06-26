@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-
+from django.db.models import Q
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -8,6 +8,7 @@ from rest_framework import status
 from .models import ChatRoom, Message
 from .serializers import ChatRoomSerializer, MessageSerializer
 from customuser.models import CustomUser as User
+from customuser.serializers import UserFollowingListSerializer
 
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 15
@@ -64,3 +65,17 @@ def get_all_messages(request, room_name):
     except Exception as e:
         print(e)
         return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])    
+def user_list_inbox(request):
+    user = request.user
+    receiver_list = Message.objects.filter(receiver = user).values_list('sender', flat=True).distinct()
+    following_list = user.following.all().values_list('id', flat=True)
+    combined_ids = set(receiver_list).union(set(following_list))
+    user_list = User.objects.filter(id__in=combined_ids).distinct()
+    serializer = UserFollowingListSerializer(user_list, many=True)
+    return Response(serializer.data)
+    
+    
+     

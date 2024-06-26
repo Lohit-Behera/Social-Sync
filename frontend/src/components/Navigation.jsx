@@ -160,7 +160,7 @@ function Navigation() {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <NavLink to="/video">
+                      <NavLink to="/video-post">
                         {({ isActive }) => (
                           <Button
                             variant={`${isActive ? "default" : "ghost"}`}

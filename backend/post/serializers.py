@@ -1,12 +1,12 @@
 from rest_framework import serializers
-from .models import TextPost, Comment
+from .models import Post, Comment
 
-class TextPostSerializer(serializers.ModelSerializer):
+class PostSerializer(serializers.ModelSerializer):
     user_name = serializers.SerializerMethodField()
     profile_image = serializers.SerializerMethodField()
 
     class Meta:
-        model = TextPost
+        model = Post
         fields = '__all__'
 
     def get_user_name(self, obj):

@@ -1,17 +1,18 @@
-import React from "react";
-import { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { fetchGetAllTextPost } from "@/features/PostSlice";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchGetAllVideoPost } from "@/features/PostSlice";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import VideoPlayer from "@/components/VideoPlayer";
 import {
   fetchFollowUser,
   fetchGetFollow,
@@ -19,20 +20,20 @@ import {
 } from "@/features/UserFollowSlice";
 import { Loader2 } from "lucide-react";
 
-function TextPostPage() {
+function VideoPostPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const userInfo = useSelector((state) => state.user.userInfo);
-  const getAllTextPost = useSelector((state) => state.post.getAllTextPost);
-  const getAllTextPostStatus = useSelector(
-    (state) => state.post.getAllTextPostStatus
+  const getAllVideoPost = useSelector((state) => state.post.getAllVideoPost);
+  const getAllVideoPostStatus = useSelector(
+    (state) => state.post.getAllVideoPostStatus
   );
+
   const follow = useSelector((state) => state.userFollow.follow);
   const followStatus = useSelector((state) => state.userFollow.followStatus);
-  const following = useSelector(
-    (state) => state.userFollow.getFollow.following
-  );
+  const following =
+    useSelector((state) => state.userFollow.getFollow.following) || [];
 
   const [loadingUser, setLoadingUser] = useState(null);
 
@@ -40,7 +41,7 @@ function TextPostPage() {
     if (!userInfo) {
       navigate("/login");
     } else {
-      dispatch(fetchGetAllTextPost());
+      dispatch(fetchGetAllVideoPost());
       dispatch(fetchGetFollow(userInfo.id));
     }
   }, [userInfo, navigate]);
@@ -65,15 +66,16 @@ function TextPostPage() {
 
   return (
     <>
-      {getAllTextPostStatus === "loading" || getAllTextPostStatus === "idle" ? (
-        <div>Loading...</div>
-      ) : getAllTextPostStatus === "failed" ? (
+      {getAllVideoPostStatus === "loading" ||
+      getAllVideoPostStatus === "idle" ? (
+        <p>Loading...</p>
+      ) : getAllVideoPostStatus === "failed" ? (
         <p>Error</p>
       ) : (
-        <>
-          <h1 className="text-3xl text-center font-bold my-4">Text Post</h1>
-          <div className="w-[96%] md:w-[90%] lg:w-[95%] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
-            {getAllTextPost.map((post) => (
+        <div className="w-[95%] md:w-[90%] lg:w-[85%] mx-auto">
+          <h1 className="text-3xl font-bold text-center my-4">Video Posts</h1>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {getAllVideoPost.map((post) => (
               <Card key={post.id}>
                 <CardHeader>
                   <CardTitle className="flex justify-between">
@@ -121,20 +123,23 @@ function TextPostPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <Link to={`/post/${post.id}`}>
-                    <p className="line-clamp-2 cursor-pointer">
-                      {post.content}
-                    </p>
-                  </Link>
+                  <VideoPlayer videoSrc={post.video} />
                 </CardContent>
-                <CardFooter></CardFooter>
+                <CardFooter className="justify-end">
+                  <Button
+                    size="sm"
+                    onClick={() => navigate(`/post/${post.id}`)}
+                  >
+                    Details
+                  </Button>
+                </CardFooter>
               </Card>
             ))}
           </div>
-        </>
+        </div>
       )}
     </>
   );
 }
 
-export default TextPostPage;
+export default VideoPostPage;

@@ -15,9 +15,9 @@ import { Label } from "@radix-ui/react-dropdown-menu";
 import { Button } from "@/components/ui/button";
 import {
   fetchEditTextPost,
-  fetchGetTextPost,
+  fetchGetPost,
   resetEditTextPost,
-} from "@/features/TextPostSlice";
+} from "@/features/PostSlice";
 
 function EditPost() {
   const { id, type } = useParams();
@@ -25,18 +25,16 @@ function EditPost() {
   const navigate = useNavigate();
 
   const userInfo = useSelector((state) => state.user.userInfo);
-  const getTextPost = useSelector((state) => state.textPost.getTextPost);
-  const getTextPostStatus = useSelector(
-    (state) => state.textPost.getTextPostStatus
-  );
+  const getPost = useSelector((state) => state.post.getPost);
+  const getPostStatus = useSelector((state) => state.post.getPostStatus);
   const editTextPostStatus = useSelector(
-    (state) => state.textPost.editTextPostStatus
+    (state) => state.post.editTextPostStatus
   );
   useEffect(() => {
     if (!userInfo) {
       navigate("/login");
     } else {
-      dispatch(fetchGetTextPost(id));
+      dispatch(fetchGetPost(id));
     }
   }, [userInfo, navigate, dispatch, id]);
 
@@ -50,10 +48,10 @@ function EditPost() {
     }
   }, [editTextPostStatus, navigate]);
 
-  const [textContent, setTextContent] = useState(getTextPost.content || "");
+  const [textContent, setTextContent] = useState(getPost.content || "");
 
   const handleUpdate = () => {
-    if (getTextPost.content === textContent) {
+    if (getPost.content === textContent) {
       alert("Nothing to update");
     } else {
       dispatch(
@@ -66,9 +64,9 @@ function EditPost() {
   };
   return (
     <div className="w-[95%] md:w-[85%] lg:w-[75%] mx-auto">
-      {getTextPostStatus === "loading" || getTextPostStatus === "idle" ? (
+      {getPostStatus === "loading" || getPostStatus === "idle" ? (
         <p>Loading...</p>
-      ) : getTextPostStatus === "failed" ? (
+      ) : getPostStatus === "failed" ? (
         <p>Error</p>
       ) : (
         <>

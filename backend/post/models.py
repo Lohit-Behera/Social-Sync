@@ -2,9 +2,12 @@ from django.db import models
 import uuid
 # Create your models here.
 
-class TextPost(models.Model):
+class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    image = models.ImageField(upload_to='images/', null=True, blank=True)
+    video = models.FileField(upload_to='videos/', null=True, blank=True)
     content = models.TextField(null=False, blank=False)
+    type = models.CharField(max_length=100,default="text", null=False, blank=False)
     total_likes = models.IntegerField(default=0)
     total_comments = models.IntegerField(default=0)
     total_shares = models.IntegerField(default=0)
@@ -27,7 +30,7 @@ class TextPost(models.Model):
     
 class Like(models.Model):
     user = models.ForeignKey('customuser.CustomUser', on_delete=models.CASCADE)
-    post = models.ForeignKey(TextPost, on_delete=models.CASCADE, related_name='likes')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='likes')
     like = models.BooleanField(default=False)
 
     class Meta:
@@ -35,7 +38,7 @@ class Like(models.Model):
 
 class Share(models.Model):
     user = models.ForeignKey('customuser.CustomUser', on_delete=models.CASCADE)
-    post = models.ForeignKey(TextPost, on_delete=models.CASCADE, related_name='shares')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='shares')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -47,7 +50,7 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     user = models.ForeignKey('customuser.CustomUser', on_delete=models.CASCADE, related_name='user_comments')
-    post = models.ForeignKey(TextPost, on_delete=models.CASCADE, related_name='post_comments')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='post_comments')
 
     def __str__(self):
         return self.content[:20]

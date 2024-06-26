@@ -1,7 +1,8 @@
 import React from "react";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
+import VideoPlayer from "@/components/VideoPlayer";
 import {
   Card,
   CardContent,
@@ -24,13 +25,13 @@ import {
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  fetchGetTextPost,
-  fetchDeleteTextPost,
-  resetDeleteTextPost,
-} from "@/features/TextPostSlice";
+  fetchGetPost,
+  fetchDeletePost,
+  resetDeletePost,
+} from "@/features/PostSlice";
 import { Button } from "@/components/ui/button";
 import { Heart, MessageCircle, Send, Pencil, Trash } from "lucide-react";
-import { fetchLike, resetLike } from "@/features/PostSlice";
+import { fetchLike, resetLike } from "@/features/PostRelatedSlice";
 import Comments from "@/components/Comments";
 
 function PostDetails() {
@@ -39,27 +40,27 @@ function PostDetails() {
 
   const { id } = useParams();
   const userInfo = useSelector((state) => state.user.userInfo);
-  const getTextPost = useSelector((state) => state.textPost.getTextPost) || {};
-  const getTextPostStatus = useSelector(
-    (state) => state.textPost.getTextPostStatus
+  const getPost = useSelector((state) => state.post.getPost) || {};
+  const getPostStatus = useSelector((state) => state.post.getPostStatus);
+  const postLike = useSelector((state) => state.postRelated.postLike);
+  const postLikeStatus = useSelector(
+    (state) => state.postRelated.postLikeStatus
   );
-  const postLike = useSelector((state) => state.post.postLike);
-  const postLikeStatus = useSelector((state) => state.post.postLikeStatus);
   const deleteTextPostStatus = useSelector(
-    (state) => state.textPost.deleteTextPostStatus
+    (state) => state.post.deleteTextPostStatus
   );
 
   useEffect(() => {
-    dispatch(fetchGetTextPost(id));
+    dispatch(fetchGetPost(id));
   }, [dispatch, id]);
 
   useEffect(() => {
     if (postLike.message === "Post liked") {
-      dispatch(fetchGetTextPost(id));
+      dispatch(fetchGetPost(id));
       dispatch(resetLike());
       alert("post liked successfully");
     } else if (postLike.message === "Post unliked") {
-      dispatch(fetchGetTextPost(id));
+      dispatch(fetchGetPost(id));
       dispatch(resetLike());
       alert("post unliked successfully");
     } else if (postLikeStatus === "failed") {
@@ -71,7 +72,7 @@ function PostDetails() {
   useEffect(() => {
     if (deleteTextPostStatus === "succeeded") {
       navigate("/text-post");
-      dispatch(resetDeleteTextPost());
+      dispatch(resetDeletePost());
       alert("Post deleted successfully");
     } else if (deleteTextPostStatus === "failed") {
       alert("Something went wrong");
@@ -88,7 +89,7 @@ function PostDetails() {
 
   const handleDelete = () => {
     if (userInfo) {
-      dispatch(fetchDeleteTextPost(id));
+      dispatch(fetchDeletePost(id));
     } else {
       navigate("/login");
     }
@@ -96,37 +97,37 @@ function PostDetails() {
 
   return (
     <>
-      {getTextPostStatus === "loading" || getTextPostStatus === "idle" ? (
+      {getPostStatus === "loading" || getPostStatus === "idle" ? (
         <p>Loading...</p>
-      ) : getTextPostStatus === "failed" ? (
+      ) : getPostStatus === "failed" ? (
         <p>Error</p>
       ) : (
         <>
           <h1 className="text-3xl text-center font-bold my-6">Post Details</h1>
           <div className="w-[90%] md:w-[80%] lg:w-[70%] mx-auto">
-            <Card>
+            <Card className="my-10">
               <CardHeader>
                 <CardTitle className="flex justify-between ">
                   <div className="flex space-x-2">
-                    <Link to={`/profile/${getTextPost.user}`}>
+                    <Link to={`/profile/${getPost.user}`}>
                       <Avatar className="w-12 h-12">
-                        <AvatarImage src={getTextPost.profile_image} />
+                        <AvatarImage src={getPost.profile_image} />
                         <AvatarFallback>P</AvatarFallback>
                       </Avatar>
                     </Link>
-                    <Link to={`/profile/${getTextPost.user}`}>
+                    <Link to={`/profile/${getPost.user}`}>
                       <h3 className="text-lg md:text-xl font-semibold mt-2">
-                        {getTextPost.user_name}
+                        {getPost.user_name}
                       </h3>
                     </Link>
                   </div>
-                  {userInfo?.id === getTextPost.user && (
+                  {userInfo?.id === getPost.user && (
                     <div className="flex space-x-2">
                       <Button
                         size="icon"
                         variant="outline"
                         onClick={() =>
-                          navigate(`/edit-post/${getTextPost.id}/text`)
+                          navigate(`/edit-post/${getPost.id}/text`)
                         }
                       >
                         <Pencil />
@@ -152,7 +153,7 @@ function PostDetails() {
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
                             <AlertDialogAction
                               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                              onClick={() => handleDelete(getTextPost.id)}
+                              onClick={() => handleDelete(getPost.id)}
                               variant="destructive"
                             >
                               Delete
@@ -166,28 +167,29 @@ function PostDetails() {
                 <CardDescription></CardDescription>
               </CardHeader>
               <CardContent>
-                <p>{getTextPost.content}</p>
+                {getPost.type === "video" && (
+                  <VideoPlayer videoSrc={getPost.video} />
+                )}
+                <p>{getPost.content}</p>
               </CardContent>
               <CardFooter>
                 <div className="flex justify-between w-full">
                   <p className="text-xs text-muted-foreground">
-                    Created at: {getTextPost.created_at.slice(0, 10)}{" "}
-                    {getTextPost.edited && "(edited)"}
+                    Created at: {getPost.created_at.slice(0, 10)}{" "}
+                    {getPost.edited && "(edited)"}
                   </p>
                   <div className="flex space-x-4">
                     <div className="flex flex-col">
                       <Heart onClick={handleLike} className="cursor-pointer" />
-                      <p className="text-center">{getTextPost.total_likes}</p>
+                      <p className="text-center">{getPost.total_likes}</p>
                     </div>
                     <div className="flex flex-col">
                       <MessageCircle />
-                      <p className="text-center">
-                        {getTextPost.total_comments}
-                      </p>
+                      <p className="text-center">{getPost.total_comments}</p>
                     </div>
                     <div className="flex flex-col">
                       <Send />
-                      <p className="text-center">{getTextPost.total_shares}</p>
+                      <p className="text-center">{getPost.total_shares}</p>
                     </div>
                   </div>
                 </div>

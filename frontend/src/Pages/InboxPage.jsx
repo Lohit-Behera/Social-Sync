@@ -19,22 +19,21 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { fetchUserList } from "@/features/ChatSlice";
 
 function InboxPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const followingList = useSelector((state) => state.user.followingList);
-  const followingListStatus = useSelector(
-    (state) => state.user.followingListStatus
-  );
+  const userList = useSelector((state) => state.chat.userList) || [];
+  const userListStatus = useSelector((state) => state.chat.userListStatus);
   useEffect(() => {
-    dispatch(fetchFollowingList());
+    dispatch(fetchUserList());
   }, [dispatch]);
   return (
     <>
-      {followingListStatus === "loading" || followingListStatus === "idle" ? (
+      {userListStatus === "loading" || userListStatus === "idle" ? (
         <p>Loading...</p>
-      ) : followingListStatus === "failed" ? (
+      ) : userListStatus === "failed" ? (
         <p>Error</p>
       ) : (
         <div className="w-[90%] md:w-[85%] lg:w-[80%] mx-auto">
@@ -64,7 +63,7 @@ function InboxPage() {
               </div>
             </CardHeader>
             <CardContent>
-              {followingList.map((user) => (
+              {userList.map((user) => (
                 <div
                   key={user.id}
                   className="md:w-[95%] mx-auto flex justify-between bg-background/80 p-4 rounded-lg my-4"

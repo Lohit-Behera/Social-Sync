@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 import uuid
 from PIL import Image
-from post.models import TextPost
+from post.models import Post
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -60,7 +60,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
             
     @property
     def total_posts(self):
-        return TextPost.objects.filter(user=self).count()
+        return Post.objects.filter(user=self).count()
 
 class EmailVerificationToken(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
