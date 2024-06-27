@@ -166,6 +166,29 @@ export const fetchGetAllVideoPost = createAsyncThunk('get/all/videoPost', async 
     }
 })
 
+export const fetchGetAllImagePost = createAsyncThunk('get/all/imagePost', async (_, { rejectWithValue, getState }) => {
+    try {
+        const { user: { userInfo } = {} } = getState();
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userInfo.token}`,
+            },
+        };
+        const { data } = await axios.get(
+            '/api/post/get/all/images/',
+            config
+        );
+        return data;
+    } catch (error) {
+        return rejectWithValue(
+            error.response && error.response.data.message
+                ? error.response.data.message
+                : error.message
+        );
+    }
+})
+
 const PostSlice = createSlice({
     name: "post",
     initialState: {
@@ -185,6 +208,10 @@ const PostSlice = createSlice({
         getAllVideoPostStatus: 'idle',
         getAllVideoPostError: null,
 
+        getAllImagePost: [],
+        getAllImagePostStatus: 'idle',
+        getAllImagePostError: null,
+
         getUserAllTextPost: {},
         getUserAllTextPostStatus: 'idle',
         getUserAllTextPostError: null,
@@ -196,6 +223,7 @@ const PostSlice = createSlice({
         editTextPost: null,
         editTextPostStatus: 'idle',
         editTextPostError: null,
+
     },
     reducers: {
         resetCreatePost: (state) => {
@@ -267,6 +295,19 @@ const PostSlice = createSlice({
             .addCase(fetchGetAllVideoPost.rejected, (state, action) => {
                 state.getAllVideoPostStatus = 'failed';
                 state.getAllVideoPostError = action.payload;
+            })
+
+            // Get All Image Post
+            .addCase(fetchGetAllImagePost.pending, (state) => {
+                state.getAllImagePostStatus = 'loading';
+            })
+            .addCase(fetchGetAllImagePost.fulfilled, (state, action) => {
+                state.getAllImagePostStatus = 'succeeded';
+                state.getAllImagePost = action.payload;
+            })
+            .addCase(fetchGetAllImagePost.rejected, (state, action) => {
+                state.getAllImagePostStatus = 'failed';
+                state.getAllImagePostError = action.payload;
             })
 
             // Get User All Text Post

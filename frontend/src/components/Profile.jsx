@@ -16,6 +16,7 @@ import {
   fetchGetFollow,
   resetFollow,
 } from "@/features/UserFollowSlice";
+import VideoPlayer from "@/components/VideoPlayer";
 import { fetchGetUserAllTextPost } from "@/features/PostSlice";
 import { Loader2 } from "lucide-react";
 
@@ -39,10 +40,10 @@ function Profile({ user = {} }) {
     useSelector((state) => state.userFollow.getFollow.following) || [];
   const followStatus = useSelector((state) => state.userFollow.followStatus);
   const getUserAllTextPostStatus = useSelector(
-    (state) => state.textPost.getUserAllTextPostStatus
+    (state) => state.post.getUserAllTextPostStatus
   );
   const getUserAllTextPost =
-    useSelector((state) => state.textPost.getUserAllTextPost) || [];
+    useSelector((state) => state.post.getUserAllTextPost) || [];
 
   useEffect(() => {
     dispatch(fetchGetUserAllTextPost(id));
@@ -109,19 +110,19 @@ function Profile({ user = {} }) {
           <CardContent>
             <div className="grid grid-cols-3">
               <div>
-                <p className="text-lg md:text-xl font-semibold mt-2 text-center">
+                <p className="text-base md:text-xl font-semibold mt-2 text-center">
                   Followers
                 </p>
                 <p className="text-center">{followers.length}</p>
               </div>
               <div>
-                <p className="text-lg md:text-xl font-semibold mt-2 text-center">
+                <p className="text-base md:text-xl font-semibold mt-2 text-center">
                   Following
                 </p>
                 <p className="text-center">{following.length}</p>
               </div>
               <div>
-                <p className="text-lg md:text-xl font-semibold mt-2 text-center">
+                <p className="text-base md:text-xl font-semibold mt-2 text-center">
                   Post
                 </p>
                 <p className="text-center">{total_posts}</p>
@@ -132,14 +133,29 @@ function Profile({ user = {} }) {
             <p className="text-lg md:text-xl font-semibold text-center my-4">
               Posts
             </p>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
               {Array.isArray(getUserAllTextPost) &&
                 getUserAllTextPost.map((post) => (
                   <Card key={post.id} className="bg-muted">
                     <CardHeader>
                       <CardTitle>
+                        {post.type === "video" && (
+                          <VideoPlayer
+                            videoSrc={post.video}
+                            hight="h-auto md:h-40 rounded-lg"
+                          />
+                        )}
+                        {post.type === "image" && (
+                          <Link to={`/post/${post.id}`}>
+                            <img
+                              src={post.image}
+                              alt="image"
+                              className="w-full h-40 object-cover rounded-lg"
+                            />
+                          </Link>
+                        )}
                         <Link to={`/post/${post.id}`}>
-                          <p className="line-clamp-1 text-xs md:text-sm lg:text-base text-cent">
+                          <p className="line-clamp-1 text-xs md:text-sm lg:text-base mt-2">
                             {post.content}
                           </p>
                         </Link>

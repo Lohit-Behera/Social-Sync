@@ -1,7 +1,7 @@
 import { Play } from "lucide-react";
 import React, { useRef, useState } from "react";
 
-function VideoPlayer({ videoSrc }) {
+function VideoPlayer({ videoSrc, hight = "" }) {
   const videoRef = useRef(null);
 
   const [isPlaying, setIsPlaying] = useState(false);
@@ -18,7 +18,9 @@ function VideoPlayer({ videoSrc }) {
   return (
     <div className={`relative hover:cursor-pointer`}>
       <video
-        className={`w-full ${isPlaying ? "opacity-100" : "opacity-50"}`}
+        className={`w-full ${hight} mx-auto ${
+          isPlaying ? "opacity-100" : "opacity-50"
+        }`}
         ref={videoRef}
         src={videoSrc}
         loop

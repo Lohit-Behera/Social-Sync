@@ -139,7 +139,7 @@ function Navigation() {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <NavLink to="/Picture">
+                      <NavLink to="/image-post">
                         {({ isActive }) => (
                           <Button
                             variant={`${isActive ? "default" : "ghost"}`}
@@ -154,7 +154,7 @@ function Navigation() {
                         )}
                       </NavLink>
                     </TooltipTrigger>
-                    <TooltipContent side="right">Picture</TooltipContent>
+                    <TooltipContent side="right">Image</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
                 <TooltipProvider>
@@ -339,7 +339,7 @@ function Navigation() {
                       )}
                     </NavLink>
 
-                    <NavLink to="/Picture">
+                    <NavLink to="/image-post">
                       {({ isActive }) => (
                         <Button
                           variant={`${isActive ? "default" : "ghost"}`}
@@ -349,7 +349,7 @@ function Navigation() {
                           }`}
                         >
                           <Image className="mr-2 h-4 w-4" />
-                          Picture
+                          Image
                         </Button>
                       )}
                     </NavLink>

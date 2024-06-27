@@ -5,6 +5,9 @@ from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
+from io import BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
+
 from .models import Post, Like, Comment
 from .serializers import PostSerializer, CommentSerializer
 
@@ -24,9 +27,30 @@ def create_post(request):
             )
             
         if data['type'] == 'image':
+            image = request.FILES.get('image')
+            pil_image = Image.open(image)
+            
+            # Calculate the new size preserving aspect ratio
+            original_width, original_height = pil_image.size
+            aspect_ratio = original_width / original_height
+            new_width = min(1440, original_width)
+            new_height = int(new_width / aspect_ratio)
+            
+            if new_height > 1080:
+                new_height = 1080
+                new_width = int(new_height * aspect_ratio)
+            
+            resized_image = pil_image.resize((new_width, new_height), Image.LANCZOS)
+            
+            image_io = BytesIO()
+            resized_image.save(image_io, format='JPEG', quality=70)
+            image_file = InMemoryUploadedFile(
+                image_io, None, 'resized_image.jpg', 'image/jpeg', image_io.tell(), None
+            )
+            
             post = Post.objects.create(
                 user=user,
-                image=data['image'],
+                image=image_file,
                 content=data['content'],
                 type=data['type']
             )
@@ -125,9 +149,9 @@ def delete_post(request, pk):
         post = Post.objects.get(id=pk)
         
         if post.type == 'image':
-            post.image.delete()
-        if post.type == 'video':
-            post.video.delete()
+            post.image.delete(save=False)
+        elif post.type == 'video':
+            post.video.delete(save=False)
         
         post.delete()
         return Response({'message': 'Post deleted successfully'}, status=status.HTTP_200_OK)
@@ -194,4 +218,10 @@ def get_all_video_posts(request):
     video_posts = Post.objects.filter(type='video').order_by('-created_at')
     serializer = PostSerializer(video_posts, many=True)
     return Response(serializer.data)
-    
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_all_image_posts(request):
+    image_posts = Post.objects.filter(type='image').order_by('-created_at')
+    serializer = PostSerializer(image_posts, many=True)
+    return Response(serializer.data)

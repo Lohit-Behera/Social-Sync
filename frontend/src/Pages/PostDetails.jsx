@@ -46,9 +46,7 @@ function PostDetails() {
   const postLikeStatus = useSelector(
     (state) => state.postRelated.postLikeStatus
   );
-  const deleteTextPostStatus = useSelector(
-    (state) => state.post.deleteTextPostStatus
-  );
+  const deletePostStatus = useSelector((state) => state.post.deletePostStatus);
 
   useEffect(() => {
     dispatch(fetchGetPost(id));
@@ -70,14 +68,15 @@ function PostDetails() {
   }, [postLikeStatus]);
 
   useEffect(() => {
-    if (deleteTextPostStatus === "succeeded") {
-      navigate("/text-post");
+    if (deletePostStatus === "succeeded") {
+      navigate("/profile");
       dispatch(resetDeletePost());
       alert("Post deleted successfully");
-    } else if (deleteTextPostStatus === "failed") {
+    } else if (deletePostStatus === "failed") {
+      dispatch(resetDeletePost());
       alert("Something went wrong");
     }
-  }, [deleteTextPostStatus]);
+  }, [deletePostStatus]);
 
   const handleLike = () => {
     if (userInfo) {
@@ -170,7 +169,16 @@ function PostDetails() {
                 {getPost.type === "video" && (
                   <VideoPlayer videoSrc={getPost.video} />
                 )}
-                <p>{getPost.content}</p>
+                {getPost.type === "image" && (
+                  <div className="max-w-[80vh] mx-auto">
+                    <img
+                      src={getPost.image}
+                      alt="image"
+                      className="w-auto h-full object-cover items-center "
+                    />
+                  </div>
+                )}
+                <p className="text-sm md:text-base">{getPost.content}</p>
               </CardContent>
               <CardFooter>
                 <div className="flex justify-between w-full">

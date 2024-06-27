@@ -176,23 +176,38 @@ function CreatePost() {
               <CardFooter className="flex flex-col space-y-4">
                 <div className="grid gap-2 w-full">
                   <Label htmlFor="image-upload">Create Post</Label>
-                  <input
-                    type="file"
-                    name="image"
-                    id="image-upload"
-                    accept="image/*"
-                    label="Upload Image"
-                    onChange={(e) => imageHandler(e)}
-                    className="block md:hidden w-full text-primary font-semibold file:me-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground file:hover:cursor-pointer hover:file:bg-primary/90  file:disabled:opacity-50 file:disabled:pointer-events-none cursor-pointer"
-                  />
-                  <DragNDrop
-                    className="hidden md:flex "
-                    handleDrop={handleImageDrop}
-                    uploadHandler={imageHandler}
-                    isDragging={isDragging}
-                    setIsDragging={setIsDragging}
-                    type={"image"}
-                  />
+                  {image ? (
+                    <>
+                      <img src={URL.createObjectURL(image)} />
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={(e) => setImage(null)}
+                      >
+                        New Image
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <input
+                        type="file"
+                        name="image"
+                        id="image-upload"
+                        accept="image/*"
+                        label="Upload Image"
+                        onChange={(e) => imageHandler(e)}
+                        className="block md:hidden w-full text-primary font-semibold file:me-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary file:text-primary-foreground file:hover:cursor-pointer hover:file:bg-primary/90  file:disabled:opacity-50 file:disabled:pointer-events-none cursor-pointer"
+                      />
+                      <DragNDrop
+                        className="hidden md:flex "
+                        handleDrop={handleImageDrop}
+                        uploadHandler={imageHandler}
+                        isDragging={isDragging}
+                        setIsDragging={setIsDragging}
+                        type={"image"}
+                      />
+                    </>
+                  )}
                 </div>
                 <div className="grid gap-2 w-full">
                   <Label htmlFor="message">Caption</Label>
@@ -223,7 +238,7 @@ function CreatePost() {
                 <div className="grid gap-2 w-full">
                   <Label htmlFor="video-upload">Create Post</Label>
                   {videoElement}
-                  {!video && (
+                  {!video ? (
                     <>
                       <input
                         type="file"
@@ -243,6 +258,14 @@ function CreatePost() {
                         type={"video"}
                       />
                     </>
+                  ) : (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={(e) => setVideo(null)}
+                    >
+                      New Video
+                    </Button>
                   )}
                 </div>
                 <div className="grid gap-2 w-full">
