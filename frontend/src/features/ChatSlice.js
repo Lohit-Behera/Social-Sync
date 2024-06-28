@@ -63,10 +63,11 @@ export const fetchAllMassage = createAsyncThunk('all/message', async (names, { r
         );
         return data;
     } catch (error) {
+        console.log(error);
         return rejectWithValue(
-            error.response && error.response.data.message
-                ? error.response.data.message
-                : error.message
+            error.response && error.response.data.details
+                ? error.response.data.details
+                : error.details
         );
     }
 });

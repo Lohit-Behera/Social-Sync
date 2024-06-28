@@ -9,6 +9,7 @@ import {
 import moment from "moment";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { Send } from "lucide-react";
 
 const Chat = ({ roomName }) => {
   const dispatch = useDispatch();
@@ -19,6 +20,7 @@ const Chat = ({ roomName }) => {
   const [totalPages, setTotalPages] = useState(2);
   const [currentPage, setCurrentPage] = useState(1);
   const [scroll, setScroll] = useState(false);
+  const [complete, setComplete] = useState(false);
 
   const bottom = useRef(null);
 
@@ -37,9 +39,12 @@ const Chat = ({ roomName }) => {
   );
   const allMessagesData = useSelector((state) => state.chat.allMessage) || {};
   const allMessageStatus = useSelector((state) => state.chat.allMessageStatus);
+  const allMessageError = useSelector((state) => state.chat.allMessageError);
 
   useEffect(() => {
+    console.log("it works");
     setMessages([]);
+    scrollToBottom();
     dispatch(resetInitialMessage());
     dispatch(resetAllMessage());
   }, []);
@@ -63,6 +68,9 @@ const Chat = ({ roomName }) => {
       const chatMassages = [...allMessagesData.massages].reverse();
       setMessages([...chatMassages].concat(messages));
     } else if (allMessageStatus === "failed") {
+      if (allMessageError === "Invalid page.") {
+        setComplete(true);
+      }
       setTotalPages(2);
       setCurrentPage(1);
     }
@@ -131,16 +139,20 @@ const Chat = ({ roomName }) => {
   }, [roomName, userInfo]);
 
   const sendMessage = () => {
-    const [senderId, receiverId] = roomName.split("_");
+    if (newMessage === "") {
+      alert("Please enter a message");
+    } else {
+      const [senderId, receiverId] = roomName.split("_");
 
-    websocket.current.send(
-      JSON.stringify({
-        message: newMessage,
-        sender_id: userInfo.id,
-        receiver_id: senderId === userInfo.id ? receiverId : senderId,
-      })
-    );
-    setNewMessage("");
+      websocket.current.send(
+        JSON.stringify({
+          message: newMessage,
+          sender_id: userInfo.id,
+          receiver_id: senderId === userInfo.id ? receiverId : senderId,
+        })
+      );
+      setNewMessage("");
+    }
   };
 
   return (
@@ -152,6 +164,7 @@ const Chat = ({ roomName }) => {
       ) : (
         <>
           {allMessageStatus === "loading" && <p>Loading...</p>}
+          {complete && <p className="text-center">No more messages</p>}
           <div className="space-y-4 min-h-[80vh] mb-4">
             {messages.map((msg, index) => (
               <div
@@ -165,7 +178,12 @@ const Chat = ({ roomName }) => {
                     msg.sender === userInfo.id ? "justify-end" : "justify-start"
                   }`}
                 >
-                  <p className={`flex bg-card p-2 rounded-lg`}>{msg.message}</p>
+                  <p
+                    className={`flex max-w-[70%] break-words bg-secondary p-2 rounded-lg `}
+                    style={{ wordBreak: "break-word" }}
+                  >
+                    {msg.message}
+                  </p>
                 </div>
                 <em
                   className={`text-xs text-muted-foreground ${
@@ -177,14 +195,22 @@ const Chat = ({ roomName }) => {
               </div>
             ))}
           </div>
-          <div className="grid gap-4 w-full bottom-0" ref={bottom}>
+          <div className="flex justify-center bottom-0 my-4 gap-3 p-3">
             <Input
+              className="w-[80%] md:w-full mt-0.5 bg-secondary rounded-full"
               type="text"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
             />
-            <Button onClick={sendMessage}>Send</Button>
+            <Button
+              className="rounded-full mt-1 md:mt-0"
+              size="icon"
+              onClick={sendMessage}
+            >
+              <Send className="mr-1 w-5 h-5 md:w-auto md:h-auto" />
+            </Button>
           </div>
+          <div ref={bottom}></div>
         </>
       )}
     </>

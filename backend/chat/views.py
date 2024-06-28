@@ -48,14 +48,16 @@ def get_initial_messages(request, room_name):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 def get_all_messages(request, room_name):
     try:
+        page = request.GET.get('page')
         room = get_object_or_404(ChatRoom, name=room_name)
         paginator = StandardResultsSetPagination()
         messages = Message.objects.filter(room=room).order_by('-timestamp')
         result_page = paginator.paginate_queryset(messages, request)
         serializer = MessageSerializer(result_page, many=True)
+        
         response_data = {
                 'total_pages': paginator.page.paginator.num_pages,
                 'current_page': paginator.page.number,
@@ -64,7 +66,7 @@ def get_all_messages(request, room_name):
         return Response(response_data, status=status.HTTP_200_OK)
     except Exception as e:
         print(e)
-        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"details": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])    

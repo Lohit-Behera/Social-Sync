@@ -63,7 +63,7 @@ function ChatPage() {
               </div>
             </div>
           </header>
-          <div className="w-[95%] md:w-[85%] lg:w-[80%] mx-auto mt-24 md:mt-12">
+          <div className="w-[95%] md:w-[85%] lg:w-[80%] mx-auto mt-24 md:mt-16">
             <Chat roomName={chatRoom.name} />
           </div>
         </div>

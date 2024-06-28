@@ -17,7 +17,7 @@ import {
   fetchGetFollow,
   resetFollow,
 } from "@/features/UserFollowSlice";
-import { Loader2 } from "lucide-react";
+import { Loader2, UserMinus, UserPlus } from "lucide-react";
 
 function ImagePostPage() {
   const dispatch = useDispatch();
@@ -48,7 +48,7 @@ function ImagePostPage() {
   useEffect(() => {
     if (followStatus === "succeeded") {
       dispatch(fetchGetFollow(userInfo.id));
-      alert(follow.massage);
+      // alert(follow.massage);
       setLoadingUser(null);
       dispatch(resetFollow());
     } else if (followStatus === "failed") {
@@ -72,7 +72,7 @@ function ImagePostPage() {
         <p>Error</p>
       ) : (
         <div className="w-[95%] md:w-[90%] lg:w-[85%] mx-auto">
-          <h1 className="text-3xl font-bold text-center my-4">Video Posts</h1>
+          <h1 className="text-3xl font-bold text-center my-4">Image Posts</h1>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {getAllImagePost.map((post) => (
               <Card key={post.id}>
@@ -86,7 +86,7 @@ function ImagePostPage() {
                         </Avatar>
                       </Link>
                       <Link to={`/profile/${post.user}`}>
-                        <h3 className="text-base md:text-lg font-semibold mt-2">
+                        <h3 className="text-base md:text-lg font-semibold mt-2 md:mt-0.5 lg:mt-1">
                           {post.user_name}
                         </h3>
                       </Link>
@@ -107,15 +107,14 @@ function ImagePostPage() {
                         }
                       >
                         {following.includes(post.user) ? (
-                          "Unfollow"
+                          <UserMinus />
                         ) : loadingUser === post.user &&
                           followStatus === "loading" ? (
                           <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
-                            loading
+                            <Loader2 className="animate-spin" />
                           </>
                         ) : (
-                          "Follow"
+                          <UserPlus />
                         )}
                       </Button>
                     )}

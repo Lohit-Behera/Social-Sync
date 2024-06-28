@@ -17,6 +17,7 @@ function LoginPage() {
 
   const userInfo = useSelector((state) => state.user.userInfo);
   const userInfoStatus = useSelector((state) => state.user.userInfoStatus);
+  const userInfoError = useSelector((state) => state.user.userInfoError);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,6 +27,18 @@ function LoginPage() {
       navigate("/");
     }
   }, [userInfo, navigate]);
+
+  useEffect(() => {
+    if (userInfoStatus === "failed") {
+      if (
+        userInfoError === "No active account found with the given credentials"
+      ) {
+        alert("Invalid email or password");
+      } else {
+        alert("Something went wrong");
+      }
+    }
+  }, [userInfoStatus, userInfoError]);
 
   const loginHandler = () => {
     if (!email || !password) {
@@ -42,8 +55,8 @@ function LoginPage() {
 
   return (
     <div className="w-full lg:grid lg:grid-cols-2 min-h-auto md:min-h-[100vh]">
-      <div className="flex items-center justify-center py-12">
-        <div className="mx-auto grid w-[350px] gap-6">
+      <div className="flex items-center justify-center py-12 ">
+        <div className="mx-auto grid w-[400px] gap-6 p-6 rounded-lg border-2">
           <div className="grid gap-2 text-center">
             <h1 className="text-3xl font-bold">Login</h1>
             <p className="text-balance text-muted-foreground">

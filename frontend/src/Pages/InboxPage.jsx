@@ -13,12 +13,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { fetchUserList } from "@/features/ChatSlice";
 
 function InboxPage() {
@@ -54,7 +48,7 @@ function InboxPage() {
                   {userList.map((user) => (
                     <div
                       key={user.id}
-                      className="md:w-[95%] mx-auto flex justify-between bg-background/80 p-4 rounded-lg my-4"
+                      className="md:w-[95%] mx-auto flex justify-between bg-secondary p-4 rounded-lg my-4"
                     >
                       <div className=" flex space-x-2 ">
                         <Link to={`/profile/${user.id}`}>

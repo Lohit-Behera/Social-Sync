@@ -19,11 +19,10 @@ export const fetchLogin = createAsyncThunk('user/login', async (user, { rejectWi
         
         return data;
     } catch (error) {
-
         return rejectWithValue(
-            error.response && error.response.data.message
-                ? error.response.data.message
-                : error.message
+            error.response && error.response.data.detail
+                ? error.response.data.detail
+                : error.detail
         );
     }
 });
