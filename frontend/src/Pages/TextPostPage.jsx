@@ -17,7 +17,7 @@ import {
   fetchGetFollow,
   resetFollow,
 } from "@/features/UserFollowSlice";
-import { Loader2 } from "lucide-react";
+import { Loader2, UserMinus, UserPlus } from "lucide-react";
 
 function TextPostPage() {
   const dispatch = useDispatch();
@@ -73,63 +73,77 @@ function TextPostPage() {
         <>
           <h1 className="text-3xl text-center font-bold my-4">Text Post</h1>
           <div className="w-[96%] md:w-[90%] lg:w-[95%] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
-            {getAllTextPost.map((post) => (
-              <Card key={post.id}>
-                <CardHeader>
-                  <CardTitle className="flex justify-between">
-                    <div className="flex space-x-2">
-                      <Link to={`/profile/${post.user}`}>
-                        <Avatar>
-                          <AvatarImage src={post.profile_image} />
-                          <AvatarFallback>P</AvatarFallback>
-                        </Avatar>
-                      </Link>
-                      <Link to={`/profile/${post.user}`}>
-                        <h3 className="text-base md:text-lg font-semibold mt-2">
-                          {post.user_name}
-                        </h3>
-                      </Link>
-                    </div>
-                    {post.user === userInfo.id ? null : (
-                      <Button
-                        className="text-xs md:text-sm"
-                        size="sm"
-                        variant={
-                          following.includes(post.user)
-                            ? "secondary"
-                            : "default"
-                        }
-                        onClick={() => handleFollow(post.user)}
-                        disabled={
-                          loadingUser === post.user &&
-                          followStatus === "loading"
-                        }
-                      >
-                        {following.includes(post.user) ? (
-                          "Unfollow"
-                        ) : loadingUser === post.user &&
-                          followStatus === "loading" ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
-                            loading
-                          </>
-                        ) : (
-                          "Follow"
-                        )}
-                      </Button>
-                    )}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Link to={`/post/${post.id}`}>
-                    <p className="line-clamp-2 cursor-pointer">
-                      {post.content}
-                    </p>
-                  </Link>
-                </CardContent>
-                <CardFooter></CardFooter>
-              </Card>
-            ))}
+            {getAllTextPostStatus === "loading" ||
+            getAllTextPostStatus === "idle" ? (
+              <p>Loading...</p>
+            ) : getAllTextPostStatus === "failed" ? (
+              <p>Error</p>
+            ) : (
+              <>
+                {getAllTextPost.length > 0 ? (
+                  <>
+                    {getAllTextPost.map((post) => (
+                      <Card key={post.id}>
+                        <CardHeader>
+                          <CardTitle className="flex justify-between">
+                            <div className="flex space-x-2">
+                              <Link to={`/profile/${post.user}`}>
+                                <Avatar>
+                                  <AvatarImage src={post.profile_image} />
+                                  <AvatarFallback>P</AvatarFallback>
+                                </Avatar>
+                              </Link>
+                              <Link to={`/profile/${post.user}`}>
+                                <h3 className="text-base md:text-lg font-semibold mt-2">
+                                  {post.user_name}
+                                </h3>
+                              </Link>
+                            </div>
+                            {post.user === userInfo.id ? null : (
+                              <Button
+                                className="text-xs md:text-sm"
+                                size="sm"
+                                variant={
+                                  following.includes(post.user)
+                                    ? "secondary"
+                                    : "default"
+                                }
+                                onClick={() => handleFollow(post.user)}
+                                disabled={
+                                  loadingUser === post.user &&
+                                  followStatus === "loading"
+                                }
+                              >
+                                {following.includes(post.user) ? (
+                                  <UserMinus />
+                                ) : loadingUser === post.user &&
+                                  followStatus === "loading" ? (
+                                  <>
+                                    <Loader2 className="animate-spin" />
+                                  </>
+                                ) : (
+                                  <UserPlus />
+                                )}
+                              </Button>
+                            )}
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <Link to={`/post/${post.id}`}>
+                            <p className="line-clamp-2 cursor-pointer">
+                              {post.content}
+                            </p>
+                          </Link>
+                        </CardContent>
+                        <CardFooter></CardFooter>
+                      </Card>
+                    ))}
+                  </>
+                ) : (
+                  <p className="text-lg font-semibold">No Text Post</p>
+                )}
+              </>
+            )}
           </div>
         </>
       )}

@@ -2,6 +2,8 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
+
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
@@ -12,6 +14,18 @@ from .models import Post, Like, Comment
 from .serializers import PostSerializer, CommentSerializer
 
 from PIL import Image
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 12
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+    
+    def get_paginated_response(self, data):
+        return Response({
+            'total_pages': self.page.paginator.num_pages,
+            'current_page': self.page.number,
+            'results': data
+        })
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -223,5 +237,12 @@ def get_all_video_posts(request):
 @permission_classes([IsAuthenticated])
 def get_all_image_posts(request):
     image_posts = Post.objects.filter(type='image').order_by('-created_at')
-    serializer = PostSerializer(image_posts, many=True)
-    return Response(serializer.data)
+    paginator = StandardResultsSetPagination()
+    result_page = paginator.paginate_queryset(image_posts, request)
+    serializer = PostSerializer(result_page, many=True)
+    response_data = {
+                'total_pages': paginator.page.paginator.num_pages,
+                'current_page': paginator.page.number,
+                'image_posts': serializer.data
+            }
+    return Response(response_data)

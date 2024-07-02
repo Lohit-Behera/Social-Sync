@@ -51,7 +51,6 @@ def get_initial_messages(request, room_name):
 # @permission_classes([IsAuthenticated])
 def get_all_messages(request, room_name):
     try:
-        page = request.GET.get('page')
         room = get_object_or_404(ChatRoom, name=room_name)
         paginator = StandardResultsSetPagination()
         messages = Message.objects.filter(room=room).order_by('-timestamp')

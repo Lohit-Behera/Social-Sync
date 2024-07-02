@@ -166,7 +166,7 @@ export const fetchGetAllVideoPost = createAsyncThunk('get/all/videoPost', async 
     }
 })
 
-export const fetchGetAllImagePost = createAsyncThunk('get/all/imagePost', async (_, { rejectWithValue, getState }) => {
+export const fetchGetAllImagePost = createAsyncThunk('get/all/imagePost', async (page=1, { rejectWithValue, getState }) => {
     try {
         const { user: { userInfo } = {} } = getState();
         const config = {
@@ -176,7 +176,7 @@ export const fetchGetAllImagePost = createAsyncThunk('get/all/imagePost', async 
             },
         };
         const { data } = await axios.get(
-            '/api/post/get/all/images/',
+            `/api/post/get/all/images/?page=${page}`,
             config
         );
         return data;
@@ -230,6 +230,11 @@ const PostSlice = createSlice({
             state.createPost = {};
             state.createPostStatus = 'idle';
             state.createPostError = null;
+        },
+        resetGetAllImagePost: (state) => {
+            state.getAllImagePost = [];
+            state.getAllImagePostStatus = 'idle';
+            state.getAllImagePostError = null;
         },
         resetDeleteTextPost: (state) => {
             state.deletePost = null;
@@ -351,5 +356,5 @@ const PostSlice = createSlice({
     },
 });
 
-export const { resetCreatePost, resetDeletePost, resetEditTextPost } = PostSlice.actions;
+export const { resetCreatePost, resetGetAllImagePost, resetDeletePost, resetEditTextPost } = PostSlice.actions;
 export default PostSlice.reducer;

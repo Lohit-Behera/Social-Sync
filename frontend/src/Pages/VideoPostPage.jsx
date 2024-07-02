@@ -18,7 +18,7 @@ import {
   fetchGetFollow,
   resetFollow,
 } from "@/features/UserFollowSlice";
-import { Loader2 } from "lucide-react";
+import { Loader2, UserMinus, UserPlus } from "lucide-react";
 
 function VideoPostPage() {
   const dispatch = useDispatch();
@@ -108,15 +108,14 @@ function VideoPostPage() {
                         }
                       >
                         {following.includes(post.user) ? (
-                          "Unfollow"
+                          <UserMinus />
                         ) : loadingUser === post.user &&
                           followStatus === "loading" ? (
                           <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
-                            loading
+                            <Loader2 className="animate-spin" />
                           </>
                         ) : (
-                          "Follow"
+                          <UserPlus />
                         )}
                       </Button>
                     )}
