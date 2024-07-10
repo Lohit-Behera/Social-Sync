@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchGetAllVideoPost } from "@/features/PostSlice";
+import {
+  fetchGetAllVideoPost,
+  resetGetAllVideoPost,
+} from "@/features/PostSlice";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +27,14 @@ function VideoPostPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const [loadingUser, setLoadingUser] = useState(null);
+  const [videoPosts, setVideoPosts] = useState([]);
+  const [pageLoading, setPageLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [runOneTime, setRunOneTime] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   const userInfo = useSelector((state) => state.user.userInfo);
   const getAllVideoPost = useSelector((state) => state.post.getAllVideoPost);
   const getAllVideoPostStatus = useSelector(
@@ -35,12 +46,14 @@ function VideoPostPage() {
   const following =
     useSelector((state) => state.userFollow.getFollow.following) || [];
 
-  const [loadingUser, setLoadingUser] = useState(null);
+  useEffect(() => {
+    setVideoPosts([]);
+  }, []);
 
   useEffect(() => {
     if (!userInfo) {
       navigate("/login");
-    } else {
+    } else if (videoPosts.length === 0) {
       dispatch(fetchGetAllVideoPost());
       dispatch(fetchGetFollow(userInfo.id));
     }
@@ -59,15 +72,56 @@ function VideoPostPage() {
     }
   }, [followStatus, dispatch]);
 
+  useEffect(() => {
+    if (getAllVideoPostStatus === "succeeded" && runOneTime) {
+      setRunOneTime(false);
+      setVideoPosts((prevVideoPosts) => [
+        ...prevVideoPosts,
+        ...getAllVideoPost.video_posts,
+      ]);
+      setCurrentPage(getAllVideoPost.current_page);
+      setTotalPages(getAllVideoPost.total_pages);
+      setPageLoading(false);
+      dispatch(resetGetAllVideoPost());
+      setLoading(false);
+    } else if (getAllVideoPostStatus === "failed") {
+      alert(getAllVideoPost.massage);
+      setPageLoading(false);
+      dispatch(resetGetAllVideoPost());
+    }
+  }, [getAllVideoPostStatus]);
+
   const handleFollow = (id) => {
     setLoadingUser(id);
     dispatch(fetchFollowUser(id));
   };
 
+  const handleScroll = useCallback(() => {
+    const scrollableHeight = document.documentElement.scrollHeight;
+    const scrolledFromTop = window.innerHeight + window.scrollY;
+
+    if (Math.round(scrolledFromTop) >= scrollableHeight) {
+      console.log("User has scrolled to the bottom", currentPage);
+      if (currentPage === totalPages) {
+        alert("No more posts to load");
+      } else if (currentPage < totalPages) {
+        dispatch(fetchGetAllVideoPost(currentPage + 1));
+        setLoading(true);
+        setRunOneTime(true);
+      }
+    }
+  }, [currentPage, totalPages, dispatch]);
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [handleScroll]);
+
   return (
     <>
-      {getAllVideoPostStatus === "loading" ||
-      getAllVideoPostStatus === "idle" ? (
+      {pageLoading ? (
         <p>Loading...</p>
       ) : getAllVideoPostStatus === "failed" ? (
         <p>Error</p>
@@ -75,7 +129,7 @@ function VideoPostPage() {
         <div className="w-[95%] md:w-[90%] lg:w-[85%] mx-auto">
           <h1 className="text-3xl font-bold text-center my-4">Video Posts</h1>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {getAllVideoPost.map((post) => (
+            {videoPosts.map((post) => (
               <Card key={post.id}>
                 <CardHeader>
                   <CardTitle className="flex justify-between">
@@ -135,6 +189,9 @@ function VideoPostPage() {
               </Card>
             ))}
           </div>
+          {loading && (
+            <Loader2 className="animate-spin mx-auto my-4 w-12 h-12" />
+          )}
         </div>
       )}
     </>

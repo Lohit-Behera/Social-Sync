@@ -44,7 +44,6 @@ def create_post(request):
             image = request.FILES.get('image')
             pil_image = Image.open(image)
             
-            # Calculate the new size preserving aspect ratio
             original_width, original_height = pil_image.size
             aspect_ratio = original_width / original_height
             new_width = min(1440, original_width)
@@ -119,16 +118,6 @@ def like_unlike_post(request, pk):
         print(e)
         return Response({'message': 'An error occurred while processing your request'}, status=status.HTTP_400_BAD_REQUEST)
     
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_all_text_posts(request):
-    try:
-        posts = Post.objects.filter(type='text').order_by('-created_at')
-        serializer = PostSerializer(posts, many=True)
-        return Response(serializer.data)
-    except Exception as e:
-        print(e)
-        return Response({'message': 'An error occurred while processing your request'}, status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -228,10 +217,35 @@ def edit_comment(request, pk):
     
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+def get_all_text_posts(request):
+    try:
+        text_posts = Post.objects.filter(type='text').order_by('-created_at')
+        paginator = StandardResultsSetPagination()
+        result_page = paginator.paginate_queryset(text_posts, request)
+        serializer = PostSerializer(result_page, many=True)
+        response_data = {
+                    'total_pages': paginator.page.paginator.num_pages,
+                    'current_page': paginator.page.number,
+                    'text_posts': serializer.data
+                }
+        return Response(response_data)
+    except Exception as e:
+        print(e)
+        return Response({'message': 'An error occurred while processing your request'}, status=status.HTTP_400_BAD_REQUEST)    
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_all_video_posts(request):
     video_posts = Post.objects.filter(type='video').order_by('-created_at')
-    serializer = PostSerializer(video_posts, many=True)
-    return Response(serializer.data)
+    paginator = StandardResultsSetPagination()
+    result_page = paginator.paginate_queryset(video_posts, request)
+    serializer = PostSerializer(result_page, many=True)
+    response_data = {
+                'total_pages': paginator.page.paginator.num_pages,
+                'current_page': paginator.page.number,
+                'video_posts': serializer.data
+            }
+    return Response(response_data)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

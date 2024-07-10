@@ -45,7 +45,7 @@ function ImagePostPage() {
   useEffect(() => {
     if (!userInfo) {
       navigate("/login");
-    } else {
+    } else if (imagePosts.length === 0) {
       dispatch(fetchGetAllImagePost());
       dispatch(fetchGetFollow(userInfo.id));
     }
@@ -76,6 +76,10 @@ function ImagePostPage() {
       setPageLoading(false);
       dispatch(resetGetAllImagePost());
       setLoading(false);
+    } else if (getAllImagePostStatus === "failed") {
+      setPageLoading(false);
+      setLoading(false);
+      dispatch(resetGetAllImagePost());
     }
   }, [getAllImagePostStatus]);
 

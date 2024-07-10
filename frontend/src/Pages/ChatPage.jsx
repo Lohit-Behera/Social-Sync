@@ -33,7 +33,7 @@ function ChatPage() {
         <p>Error</p>
       ) : (
         <div className="w-full">
-          <header className="fixed top-14 md:top-0 z-10 w-full backdrop-blur bg-background/50 md:pt-4">
+          <header className="fixed top-12 md:top-0 z-10 w-full backdrop-blur bg-background/50 md:pt-4">
             <div className=" flex space-x-2">
               <Button
                 size="icon"

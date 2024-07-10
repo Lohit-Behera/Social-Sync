@@ -49,30 +49,6 @@ export const fetchGetPost = createAsyncThunk('get/post', async (id, { rejectWith
     }
 });
 
-export const fetchGetAllTextPost = createAsyncThunk('get/all/textPost', async (_, { rejectWithValue, getState }) => {
-    try {
-        const { user: { userInfo } = {} } = getState();
-        const config = {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${userInfo.token}`,
-            },
-        };
-        const { data } = await axios.get(
-            '/api/post/get/all/text/',
-            config
-        );
-
-        return data;
-    } catch (error) {
-        return rejectWithValue(
-            error.response && error.response.data.message
-                ? error.response.data.message
-                : error.message
-        );
-    }
-});
-
 export const fetchGetUserAllTextPost = createAsyncThunk('get/user/all/textPost', async (id, { rejectWithValue, getState }) => {
     try {
         const { user: { userInfo } = {} } = getState();
@@ -187,7 +163,31 @@ export const fetchGetAllImagePost = createAsyncThunk('get/all/imagePost', async 
                 : error.message
         );
     }
-})
+});
+
+export const fetchGetAllTextPost = createAsyncThunk('get/all/textPost', async (page=1, { rejectWithValue, getState }) => {
+    try {
+        const { user: { userInfo } = {} } = getState();
+        const config = {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userInfo.token}`,
+            },
+        };
+        const { data } = await axios.get(
+            `/api/post/get/all/text/?page=${page}`,
+            config
+        );
+
+        return data;
+    } catch (error) {
+        return rejectWithValue(
+            error.response && error.response.data.message
+                ? error.response.data.message
+                : error.message
+        );
+    }
+});
 
 const PostSlice = createSlice({
     name: "post",
@@ -235,6 +235,16 @@ const PostSlice = createSlice({
             state.getAllImagePost = [];
             state.getAllImagePostStatus = 'idle';
             state.getAllImagePostError = null;
+        },
+        resetGetAllVideoPost: (state) => {
+            state.getAllVideoPost = {};
+            state.getAllVideoPostStatus = 'idle';
+            state.getAllVideoPostError = null;
+        },
+        resetGetAllTextPost: (state) => {
+            state.getAllTextPost = {};
+            state.getAllTextPostStatus = 'idle';
+            state.getAllTextPostError = null;
         },
         resetDeleteTextPost: (state) => {
             state.deletePost = null;
@@ -356,5 +366,5 @@ const PostSlice = createSlice({
     },
 });
 
-export const { resetCreatePost, resetGetAllImagePost, resetDeletePost, resetEditTextPost } = PostSlice.actions;
+export const { resetCreatePost, resetGetAllImagePost, resetGetAllVideoPost, resetGetAllTextPost, resetDeletePost, resetEditTextPost } = PostSlice.actions;
 export default PostSlice.reducer;

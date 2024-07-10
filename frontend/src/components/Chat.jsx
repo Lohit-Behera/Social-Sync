@@ -9,7 +9,7 @@ import {
 import moment from "moment";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { Send } from "lucide-react";
+import { Loader2, Send } from "lucide-react";
 
 const Chat = ({ roomName }) => {
   const dispatch = useDispatch();
@@ -42,7 +42,6 @@ const Chat = ({ roomName }) => {
   const allMessageError = useSelector((state) => state.chat.allMessageError);
 
   useEffect(() => {
-    console.log("it works");
     setMessages([]);
     scrollToBottom();
     dispatch(resetInitialMessage());
@@ -98,8 +97,7 @@ const Chat = ({ roomName }) => {
 
   useEffect(() => {
     if (isAtTop) {
-      console.log("Scrolled to top!");
-      if (currentPage < totalPages) {
+      if (currentPage < totalPages && !complete) {
         dispatch(
           fetchAllMassage({
             roomName: roomName,
@@ -163,7 +161,9 @@ const Chat = ({ roomName }) => {
         <p>Something went wrong</p>
       ) : (
         <>
-          {allMessageStatus === "loading" && <p>Loading...</p>}
+          {allMessageStatus === "loading" && (
+            <Loader2 className="animate-spin mx-auto my-4 w-12 h-12" />
+          )}
           {complete && <p className="text-center">No more messages</p>}
           <div className="space-y-4 min-h-[80vh] mb-4">
             {messages.map((msg, index) => (
